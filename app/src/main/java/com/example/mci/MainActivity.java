@@ -23,6 +23,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     file = new File(directory, filename);
 
                     fileOutputStream = new FileOutputStream(file);
+                    fileOutputStream.write("System Timestamp, Sensor Uptime, x, y, z\n".getBytes());
                     write = true;
                     updateStatusForFile(file, "create");
                 } catch (IOException e) {
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             this.z.setText("Z: " + sensorEvent.values[2]);
 
             if(this.write) {
-                String outwrite = getTime() + ", "
+                String outwrite = getTime() + ", " + getSensorTime(sensorEvent.timestamp) + ", "
                         + sensorEvent.values[0] + ", "
                         + sensorEvent.values[1] + ", "
                         + sensorEvent.values[2] + "\n";
@@ -142,6 +144,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {}
+
+    private String getSensorTime(long sensorTime){
+        sensorTime /= 1000000000;
+        long sec = sensorTime % 60;
+        long min = (sensorTime /60) % 60;
+        long hour = (sensorTime /(60*60)) % 24;
+        long day = (sensorTime / (24*60*60)) % 24;
+
+        return Long.toString(day) + "-" + Long.toString(hour)
+                + "-" + Long.toString(min) + "-" + Long.toString(sec);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String getTime(){
