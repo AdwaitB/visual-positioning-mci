@@ -7,31 +7,31 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/y"
+        android:id="@+id/y_acc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="y"
+        android:text="y_acc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/time_acc" />
 
     <TextView
-        android:id="@+id/z"
+        android:id="@+id/z_acc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="z"
+        android:text="z_acc"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/y"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/y_acc"
+        app:layout_constraintTop_toBottomOf="@+id/time_acc" />
 
     <TextView
-        android:id="@+id/x"
+        android:id="@+id/x_acc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="x"
-        app:layout_constraintEnd_toStartOf="@+id/y"
+        android:text="x_acc"
+        app:layout_constraintEnd_toStartOf="@+id/y_acc"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/time_acc" />
 
     <Button
         android:id="@+id/makefile"
@@ -47,9 +47,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="No file created! Press the button below."
+        app:layout_constraintBottom_toTopOf="@+id/deletefile"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/y" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/checkfile"
@@ -69,5 +70,78 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/x_gyro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="x_gyro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.198"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_gyro" />
+
+    <TextView
+        android:id="@+id/y_gyro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="y_gyro"
+        app:layout_constraintEnd_toStartOf="@+id/z_gyro"
+        app:layout_constraintStart_toEndOf="@+id/x_gyro"
+        app:layout_constraintTop_toBottomOf="@+id/time_gyro" />
+
+    <TextView
+        android:id="@+id/z_gyro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="z_gyro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/y_gyro"
+        app:layout_constraintTop_toBottomOf="@+id/time_gyro" />
+
+    <TextView
+        android:id="@+id/light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_light" />
+
+    <TextView
+        android:id="@+id/time_acc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="time_acc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time_gyro"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="time_gyro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/y_acc" />
+
+    <TextView
+        android:id="@+id/time_light"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="time_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/y_gyro" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
