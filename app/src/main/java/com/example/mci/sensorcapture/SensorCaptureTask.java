@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SensorCaptureTask {
-    private static final int BUCKET_WINDOW = 10000000;
+    private static final int BUCKET_WINDOW = 100000000;
 
     private Map<Long, ReadingBucket> buckets;
 
