@@ -34,12 +34,16 @@
         app:layout_constraintTop_toBottomOf="@+id/time_acc" />
 
     <Button
-        android:id="@+id/makefile"
-        android:layout_width="wrap_content"
+        android:id="@+id/toggleBucketing"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Make File"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:text="START"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/deletefile"
+        app:layout_constraintEnd_toStartOf="@+id/dumpData"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -47,29 +51,36 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="No file created! Press the button below."
-        app:layout_constraintBottom_toTopOf="@+id/deletefile"
+        app:layout_constraintBottom_toTopOf="@+id/dumpData"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/checkfile"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Check File"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:text="CHECK FILE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/deletefile" />
+        app:layout_constraintStart_toEndOf="@+id/dumpData" />
 
     <Button
-        android:id="@+id/deletefile"
-        android:layout_width="wrap_content"
+        android:id="@+id/dumpData"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Delete File"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:text="Dump Data"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/checkfile"
+        app:layout_constraintStart_toEndOf="@+id/toggleBucketing" />
 
     <TextView
         android:id="@+id/time"

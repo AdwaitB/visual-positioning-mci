@@ -13,7 +13,7 @@ import java.util.Map;
  * Abstraction to insert multiple values in a bucket for a fixed time duration.
  */
 public class ReadingBucket {
-    private static int BUCKET_SIZE = 0;
+    public static int BUCKET_SIZE = 0;
 
     private static final Map<Integer, Integer> SENSOR_READING_SIZES;
     private static final Map<Integer, Integer> SENSOR_INDEX_START;
@@ -43,6 +43,19 @@ public class ReadingBucket {
         SENSOR_INDEX_TO_NAME.put(6, "mag_y");
         SENSOR_INDEX_TO_NAME.put(7, "mag_z");
         SENSOR_INDEX_TO_NAME.put(8, "light");
+    }
+
+    public static String getHeader(){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("timestamp");
+
+        for(String val : SENSOR_INDEX_TO_NAME.values())
+            builder.append(val);
+
+        builder.append('\n');
+
+        return builder.toString();
     }
 
     Map<Integer, Float> bucketValues;

@@ -2,6 +2,11 @@ package com.example.mci.sensorcapture;
 
 import android.hardware.SensorEvent;
 
+import com.example.mci.utils.TimeUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +15,7 @@ public class SensorCaptureTask {
 
     private Map<Long, ReadingBucket> buckets;
 
-    SensorCaptureTask(){
+    public SensorCaptureTask(){
         buckets = new HashMap<>();
     }
 
@@ -23,8 +28,30 @@ public class SensorCaptureTask {
         this.buckets.get(bucket).add(sensorEvent);
     }
 
-    public void serialize(){
+    public void serialize(File file){
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(ReadingBucket.getHeader().getBytes());
 
+            for(Long timestamp : buckets.keySet()){
+                StringBuilder entry = new StringBuilder(TimeUtils.getSensorTime(timestamp) + ' ');
+
+                Map<Integer, Float> bucketValues = buckets.get(timestamp).bucketValues;
+                for(int i = 0; i < ReadingBucket.BUCKET_SIZE; i++) {
+                    entry.append(',');
+                    if(bucketValues.containsKey(i))
+                        entry.append(bucketValues.get(i).toString());
+                }
+                entry.append('\n');
+
+                fileOutputStream.write(entry.toString().getBytes());
+            }
+
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private long getBucket(long sensorTime){
