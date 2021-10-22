@@ -7,12 +7,11 @@ import com.example.mci.utils.TimeUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class SensorCaptureTask {
-    private static final int BUCKET_WINDOW = 1000000000;
+    private static final int BUCKET_WINDOW = 5000000;
 
     private Map<Long, ReadingBucket> buckets;
 

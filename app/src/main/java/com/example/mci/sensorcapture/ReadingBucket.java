@@ -27,7 +27,7 @@ public class ReadingBucket {
 
         SENSOR_READING_SIZES.put(Sensor.TYPE_ACCELEROMETER, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
-        SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 2);
+        SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_LIGHT, 1);
 
         for(Integer key : SENSOR_READING_SIZES.keySet()) {
@@ -43,6 +43,7 @@ public class ReadingBucket {
         SENSOR_INDEX_TO_NAME.put(7, "mag_z");
         SENSOR_INDEX_TO_NAME.put(3, "gyro_x");
         SENSOR_INDEX_TO_NAME.put(4, "gyro_y");
+        SENSOR_INDEX_TO_NAME.put(4, "gyro_z");
         SENSOR_INDEX_TO_NAME.put(8, "light");
     }
 

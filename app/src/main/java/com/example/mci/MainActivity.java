@@ -31,8 +31,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Button toggleBucketing, dumpData, checkfile;
 
     private TextView x_acc, y_acc, z_acc;
+    private TextView x_mag, y_mag, z_mag;
     private TextView x_gyro, y_gyro, z_gyro;
-    private TextView time_acc, time_gyro, time_light;
+    private TextView time_acc, time_mag, time_gyro, time_light;
     private TextView light;
     private TextView status;
 
@@ -44,6 +45,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         x_acc = (TextView) findViewById(R.id.x_acc);
         y_acc = (TextView) findViewById(R.id.y_acc);
         z_acc = (TextView) findViewById(R.id.z_acc);
+
+        time_mag = (TextView) findViewById(R.id.time_mag);
+
+        x_mag = (TextView) findViewById(R.id.x_mag);
+        y_mag = (TextView) findViewById(R.id.y_mag);
+        z_mag = (TextView) findViewById(R.id.z_mag);
 
         time_gyro = (TextView) findViewById(R.id.time_gyro);
 
@@ -113,19 +120,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL
+                SensorManager.SENSOR_DELAY_FASTEST
+        );
+
+        sensorManager.registerListener(
+                this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_FASTEST
         );
 
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_NORMAL
+                SensorManager.SENSOR_DELAY_FASTEST
         );
 
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_NORMAL
+                SensorManager.SENSOR_DELAY_FASTEST
         );
     }
 
@@ -157,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             this.x_acc.setText("X acc: " + sensorEvent.values[0]);
             this.y_acc.setText("Y acc: " + sensorEvent.values[1]);
             this.z_acc.setText("Z acc: " + sensorEvent.values[2]);
+        }
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD){
+            this.time_mag.setText("Gyro Time : " + sensorEvent.timestamp);
+
+            this.x_mag.setText("X acc: " + sensorEvent.values[0]);
+            this.y_mag.setText("Y acc: " + sensorEvent.values[1]);
+            this.z_mag.setText("Z acc: " + sensorEvent.values[2]);
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_GYROSCOPE){
             this.time_gyro.setText("Gyro Time : " + sensorEvent.timestamp);
