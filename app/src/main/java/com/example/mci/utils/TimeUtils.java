@@ -10,7 +10,7 @@ public class TimeUtils {
     public static String getSensorTime(long sensorTime){
         sensorTime /= 1000000;
         long ms = sensorTime%1000;
-        
+
         sensorTime /= 1000;
         long sec = sensorTime % 60;
         long min = (sensorTime / 60) % 60;
