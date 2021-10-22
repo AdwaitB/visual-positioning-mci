@@ -29,13 +29,13 @@ public class ReadingBucket {
         SENSOR_SEQ = new ArrayList<>();
 
         SENSOR_SEQ.add(Sensor.TYPE_ACCELEROMETER);
-        SENSOR_SEQ.add(Sensor.TYPE_MAGNETIC_FIELD);
         SENSOR_SEQ.add(Sensor.TYPE_GYROSCOPE);
+        SENSOR_SEQ.add(Sensor.TYPE_MAGNETIC_FIELD);
         SENSOR_SEQ.add(Sensor.TYPE_LIGHT);
 
         SENSOR_READING_SIZES.put(Sensor.TYPE_ACCELEROMETER, 3);
-        SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 3);
+        SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_LIGHT, 1);
 
         for(Integer key : SENSOR_SEQ) {
@@ -46,13 +46,13 @@ public class ReadingBucket {
         SENSOR_INDEX_TO_NAME.put(0, "acc_x");
         SENSOR_INDEX_TO_NAME.put(1, "acc_y");
         SENSOR_INDEX_TO_NAME.put(2, "acc_z");
-        SENSOR_INDEX_TO_NAME.put(5, "mag_x");
-        SENSOR_INDEX_TO_NAME.put(6, "mag_y");
-        SENSOR_INDEX_TO_NAME.put(7, "mag_z");
         SENSOR_INDEX_TO_NAME.put(3, "gyro_x");
         SENSOR_INDEX_TO_NAME.put(4, "gyro_y");
-        SENSOR_INDEX_TO_NAME.put(4, "gyro_z");
-        SENSOR_INDEX_TO_NAME.put(8, "light");
+        SENSOR_INDEX_TO_NAME.put(5, "gyro_z");
+        SENSOR_INDEX_TO_NAME.put(6, "mag_x");
+        SENSOR_INDEX_TO_NAME.put(7, "mag_y");
+        SENSOR_INDEX_TO_NAME.put(8, "mag_z");
+        SENSOR_INDEX_TO_NAME.put(9, "light");
     }
 
     public static String getHeader(){
