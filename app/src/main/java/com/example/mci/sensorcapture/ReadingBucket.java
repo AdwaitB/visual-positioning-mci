@@ -25,8 +25,8 @@ public class ReadingBucket {
         SENSOR_INDEX_TO_NAME = new HashMap<>();
 
         SENSOR_READING_SIZES.put(Sensor.TYPE_ACCELEROMETER, 3);
-        SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 2);
         SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
+        SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 2);
         SENSOR_READING_SIZES.put(Sensor.TYPE_LIGHT, 1);
 
         for(Integer key : SENSOR_READING_SIZES.keySet()) {
@@ -37,11 +37,11 @@ public class ReadingBucket {
         SENSOR_INDEX_TO_NAME.put(0, "acc_x");
         SENSOR_INDEX_TO_NAME.put(1, "acc_y");
         SENSOR_INDEX_TO_NAME.put(2, "acc_z");
-        SENSOR_INDEX_TO_NAME.put(3, "gyro_x");
-        SENSOR_INDEX_TO_NAME.put(4, "gyro_y");
         SENSOR_INDEX_TO_NAME.put(5, "mag_x");
         SENSOR_INDEX_TO_NAME.put(6, "mag_y");
         SENSOR_INDEX_TO_NAME.put(7, "mag_z");
+        SENSOR_INDEX_TO_NAME.put(3, "gyro_x");
+        SENSOR_INDEX_TO_NAME.put(4, "gyro_y");
         SENSOR_INDEX_TO_NAME.put(8, "light");
     }
 
@@ -51,7 +51,7 @@ public class ReadingBucket {
         builder.append("timestamp");
 
         for(String val : SENSOR_INDEX_TO_NAME.values())
-            builder.append(val);
+            builder.append(',').append(val);
 
         builder.append('\n');
 
@@ -71,7 +71,7 @@ public class ReadingBucket {
         Integer sensorValuesQuantity = SENSOR_READING_SIZES.get(sensorEvent.sensor.getType());
 
         for(Integer index = sensorIndexStart; index < sensorIndexStart + sensorValuesQuantity; index++){
-            Float value = sensorEvent.values[index - sensorValuesQuantity];
+            Float value = sensorEvent.values[index - sensorIndexStart];
 
             if(!bucketValues.containsKey(index)) {
                 bucketValues.put(index, value);
