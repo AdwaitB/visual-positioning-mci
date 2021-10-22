@@ -20,17 +20,25 @@ public class ReadingBucket {
     private static final Map<Integer, Integer> SENSOR_INDEX_START;
     private static final Map<Integer, String> SENSOR_INDEX_TO_NAME;
 
+    private static final List<Integer> SENSOR_SEQ;
+
     static {
         SENSOR_READING_SIZES = new TreeMap<>();
         SENSOR_INDEX_START = new TreeMap<>();
         SENSOR_INDEX_TO_NAME = new TreeMap<>();
+        SENSOR_SEQ = new ArrayList<>();
+
+        SENSOR_SEQ.add(Sensor.TYPE_ACCELEROMETER);
+        SENSOR_SEQ.add(Sensor.TYPE_MAGNETIC_FIELD);
+        SENSOR_SEQ.add(Sensor.TYPE_GYROSCOPE);
+        SENSOR_SEQ.add(Sensor.TYPE_LIGHT);
 
         SENSOR_READING_SIZES.put(Sensor.TYPE_ACCELEROMETER, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_GYROSCOPE, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_LIGHT, 1);
 
-        for(Integer key : SENSOR_READING_SIZES.keySet()) {
+        for(Integer key : SENSOR_SEQ) {
             SENSOR_INDEX_START.put(key, BUCKET_SIZE);
             BUCKET_SIZE += SENSOR_READING_SIZES.get(key);
         }
