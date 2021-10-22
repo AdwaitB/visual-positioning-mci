@@ -21,12 +21,17 @@ import android.widget.TextView;
 import com.example.mci.sensorcapture.SensorCaptureTask;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String FILENAME = "data.txt";
 
     private SensorManager sensorManager;
-    private SensorCaptureTask sensorCaptureTask;
+    private HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
+
+    private ArrayList<Integer> samplingSizes;
 
     private Button toggleBucketing, dumpData, checkfile;
 
@@ -71,10 +76,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                File file = getFile();
-                updateStatusForFile(file, "check");
                 track = true;
-                updateStatusForFile(file, "track");
+                for(Integer samplingSize : samplingSizes){
+                    File file = getFile(samplingSize);
+                    updateStatusForFile(file, "track");
+                }
             }
         });
 
@@ -83,8 +89,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                File file = getFile();
-                updateStatusForFile(file, "check");
+                for(Integer samplingSize : samplingSizes){
+                    File file = getFile(samplingSize);
+                    updateStatusForFile(file, "check");
+                }
             }
         });
 
@@ -92,10 +100,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onLongClick(View v) {
-                File file = getFile();
-                updateStatusForFile(file, "check");
-                updateStatusForFile(file, "delete");
-                if(file.exists()) file.delete();
+                for(Integer samplingSize : samplingSizes){
+                    File file = getFile(samplingSize);
+                    updateStatusForFile(file, "delete");
+                    if(file.exists()) file.delete();
+                }
                 return true;
             }
         });
@@ -106,16 +115,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View view) {
                 track = false;
-                File file = getFile();
-                sensorCaptureTask.serialize(file);
-                updateStatusForFile(file, "dumped");
+                for(Integer samplingSize : samplingSizes){
+                    File file = getFile(samplingSize);
+                    sensorCaptureTasks.get(samplingSize).serialize(file);
+                    updateStatusForFile(file, "dumped");
+                }
             }
         });
     }
 
     private void initSensors(){
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        sensorCaptureTask = new SensorCaptureTask();
+
+        samplingSizes = new ArrayList<>();
+        samplingSizes.add(1);
+        samplingSizes.add(5);
+        samplingSizes.add(10);
+        samplingSizes.add(20);
+        samplingSizes.add(50);
+
+        sensorCaptureTasks = new HashMap<>();
+        for(int samplingSize : samplingSizes)
+            sensorCaptureTasks.put(samplingSize, new SensorCaptureTask(samplingSize));
 
         sensorManager.registerListener(
                 this,
@@ -142,10 +163,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         );
     }
 
-    private File getFile(){
+    private File getFile(int prefix){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(directory, FILENAME);
+        File file = new File(directory, prefix + "_" + FILENAME);
         return file;
     }
 
@@ -191,8 +212,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             this.light.setText("Light: " + sensorEvent.values[0]);
         }
 
-        if(track)
-            sensorCaptureTask.captureEntry(sensorEvent);
+        if(track){
+            for(SensorCaptureTask sensorCaptureTask : this.sensorCaptureTasks.values())
+                sensorCaptureTask.captureEntry(sensorEvent);
+        }
     }
 
     @Override

@@ -7,7 +7,7 @@ import androidx.annotation.RequiresApi;
 import java.time.LocalDateTime;
 
 public class TimeUtils {
-    public static String getSensorTime(long sensorTime){
+    public static String parseSensorTime(long sensorTime){
         sensorTime /= 1000000;
         long ms = sensorTime%1000;
 

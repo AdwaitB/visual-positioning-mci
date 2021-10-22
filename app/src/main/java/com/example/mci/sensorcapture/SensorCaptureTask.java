@@ -11,12 +11,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class SensorCaptureTask {
-    private static final int BUCKET_WINDOW = 5000000;
+    private final int bucketSize;
+    private static final int MS = 1000000;
 
     private Map<Long, ReadingBucket> buckets;
 
-    public SensorCaptureTask(){
+    public SensorCaptureTask(int bucketSizeMs){
         buckets = new TreeMap<>();
+        this.bucketSize = bucketSizeMs*MS;
     }
 
     public void captureEntry(SensorEvent sensorEvent){
@@ -35,7 +37,7 @@ public class SensorCaptureTask {
             fileOutputStream.write(ReadingBucket.getHeader().getBytes());
 
             for(Long timestamp : buckets.keySet()){
-                StringBuilder entry = new StringBuilder(TimeUtils.getSensorTime(timestamp));
+                StringBuilder entry = new StringBuilder(Long.toString(timestamp/MS));
 
                 Map<Integer, Float> bucketValues = buckets.get(timestamp).bucketValues;
                 for(int i = 0; i < ReadingBucket.BUCKET_SIZE; i++) {
@@ -55,7 +57,7 @@ public class SensorCaptureTask {
     }
 
     private long getBucket(long sensorTime){
-        sensorTime /= BUCKET_WINDOW;
-        return sensorTime * BUCKET_WINDOW;
+        sensorTime /= bucketSize;
+        return sensorTime * bucketSize;
     }
 }

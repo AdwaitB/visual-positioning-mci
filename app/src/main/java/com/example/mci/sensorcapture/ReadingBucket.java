@@ -93,6 +93,7 @@ public class ReadingBucket {
 
                 avg *= cnt;
                 avg += value;
+                avg /= cnt+1;
 
                 bucketValues.put(index, avg);
                 bucketCounts.put(index, cnt+1);
