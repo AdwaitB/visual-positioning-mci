@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Abstraction to insert multiple values in a bucket for a fixed time duration.
@@ -20,9 +21,9 @@ public class ReadingBucket {
     private static final Map<Integer, String> SENSOR_INDEX_TO_NAME;
 
     static {
-        SENSOR_READING_SIZES = new HashMap<>();
-        SENSOR_INDEX_START = new HashMap<>();
-        SENSOR_INDEX_TO_NAME = new HashMap<>();
+        SENSOR_READING_SIZES = new TreeMap<>();
+        SENSOR_INDEX_START = new TreeMap<>();
+        SENSOR_INDEX_TO_NAME = new TreeMap<>();
 
         SENSOR_READING_SIZES.put(Sensor.TYPE_ACCELEROMETER, 3);
         SENSOR_READING_SIZES.put(Sensor.TYPE_MAGNETIC_FIELD, 3);
