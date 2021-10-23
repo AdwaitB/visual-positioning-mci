@@ -19,21 +19,36 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.mci.sensorcapture.SensorCaptureTask;
+import com.example.mci.stepcounter.Filter;
+import com.example.mci.stepcounter.SensorReading;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String FILENAME = "data.txt";
+    private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_FASTEST;
 
     private SensorManager sensorManager;
     private HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
 
     private ArrayList<Integer> samplingSizes;
 
-    private Button toggleBucketing, dumpData, checkfile;
+
+    private Button toggleBucketing, dumpData, checkfile, counter;
+    private Integer stepCount;
+
+    public static Boolean stepActive;
+
+    private ArrayBlockingQueue<SensorReading> raw, filtered, exaggerated, detection;
+    private Filter filter;
+    private Thread filterThread;
 
     private TextView x_acc, y_acc, z_acc;
     private TextView x_mag, y_mag, z_mag;
@@ -41,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView time_acc, time_mag, time_gyro, time_light;
     private TextView light;
     private TextView status;
+
+    public static TextView debug;
 
     boolean track = false;
 
@@ -68,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         light = (TextView) findViewById(R.id.light);
 
         status = (TextView) findViewById(R.id.status);
+
+        debug = (TextView) findViewById(R.id.debug);
     }
 
     private void initButtons(){
@@ -122,6 +141,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
+
+        counter = (Button) findViewById(R.id.counter);
+        counter.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                stepCount = 0;
+                counter.setText(stepCount.toString());
+            }
+        });
+
+        counter.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View view) {
+                stepActive = !stepActive;
+                if(!stepActive) {
+                    counter.setText("INACTIVE");
+                    joinThreads();
+                }
+                else {
+                    counter.setText(stepCount.toString());
+                    startThreads();
+                }
+                return true;
+            }
+        });
     }
 
     private void initSensors(){
@@ -141,26 +183,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_FASTEST
+                SENSOR_LEVEL
         );
 
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_FASTEST
+                SENSOR_LEVEL
         );
 
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_FASTEST
+                SENSOR_LEVEL
         );
 
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_FASTEST
+                SENSOR_LEVEL
         );
+    }
+
+    private void initStepCounter(){
+        raw = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+        filtered = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+        exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+        detection = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+
+        stepActive = false;
+        stepCount = 0;
+
+        filter = new Filter(raw, filtered);
     }
 
     private File getFile(int prefix){
@@ -168,6 +222,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         File file = new File(directory, prefix + "_" + FILENAME);
         return file;
+    }
+
+    private void startThreads(){
+        filterThread = new Thread(filter);
+        filterThread.start();
+    }
+
+    private void joinThreads(){
+        try {
+            filterThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -180,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         initViews();
         initButtons();
         initSensors();
+        initStepCounter();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -191,6 +259,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             this.x_acc.setText("X acc: " + sensorEvent.values[0]);
             this.y_acc.setText("Y acc: " + sensorEvent.values[1]);
             this.z_acc.setText("Z acc: " + sensorEvent.values[2]);
+
+            if(stepActive) {
+                try {
+                    raw.offer(new SensorReading(sensorEvent.timestamp, Math.sqrt(0
+                            + Math.pow(sensorEvent.values[0], 2)
+                            + Math.pow(sensorEvent.values[1], 2)
+                            + Math.pow(sensorEvent.values[2], 2)
+                    )), 100, TimeUnit.MICROSECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD){
             this.time_mag.setText("Gyro Time : " + sensorEvent.timestamp);

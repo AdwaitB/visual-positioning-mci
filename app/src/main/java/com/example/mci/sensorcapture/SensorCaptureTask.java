@@ -2,8 +2,6 @@ package com.example.mci.sensorcapture;
 
 import android.hardware.SensorEvent;
 
-import com.example.mci.utils.TimeUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
