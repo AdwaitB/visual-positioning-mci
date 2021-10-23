@@ -25,15 +25,12 @@ import com.example.mci.stepcounter.SensorReading;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String FILENAME = "data.txt";
-    private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_FASTEST;
+    private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_NORMAL;
 
     private SensorManager sensorManager;
     private HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
@@ -262,11 +259,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if(stepActive) {
                 try {
-                    raw.offer(new SensorReading(sensorEvent.timestamp, Math.sqrt(0
-                            + Math.pow(sensorEvent.values[0], 2)
-                            + Math.pow(sensorEvent.values[1], 2)
-                            + Math.pow(sensorEvent.values[2], 2)
-                    )), 100, TimeUnit.MICROSECONDS);
+                    SensorReading sensorReading = new SensorReading(
+                            sensorEvent.timestamp,
+                            Math.sqrt(0
+                                    + Math.pow(sensorEvent.values[0], 2)
+                                    + Math.pow(sensorEvent.values[1], 2)
+                                    + Math.pow(sensorEvent.values[2], 2)
+                            )
+                    );
+
+                    raw.offer(sensorReading, 100, TimeUnit.MICROSECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
