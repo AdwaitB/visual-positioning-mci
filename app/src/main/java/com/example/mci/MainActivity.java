@@ -20,6 +20,8 @@ import android.widget.TextView;
 
 import com.example.mci.sensorcapture.SensorCaptureTask;
 import com.example.mci.stepcounter.Filter;
+import com.example.mci.stepcounter.Exaggerate;
+import com.example.mci.stepcounter.Detect;
 import com.example.mci.stepcounter.SensorReading;
 
 import java.io.File;
@@ -30,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String FILENAME = "data.txt";
-    private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_NORMAL;
+    private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_GAME;
 
     private SensorManager sensorManager;
     private HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
@@ -45,7 +47,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private ArrayBlockingQueue<SensorReading> raw, filtered, exaggerated, detection;
     private Filter filter;
+    private Exaggerate exaggerate;
+    private Detect detect;
     private Thread filterThread;
+    private Thread exaggerateThread;
+    private Thread detectThread;
 
     private TextView x_acc, y_acc, z_acc;
     private TextView x_mag, y_mag, z_mag;
@@ -212,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         stepCount = 0;
 
         filter = new Filter(raw, filtered);
+        exaggerate = new Exaggerate(filtered, exaggerated);
+        detect = new Detect(exaggerated, detection);
     }
 
     private File getFile(int prefix){
@@ -224,11 +232,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void startThreads(){
         filterThread = new Thread(filter);
         filterThread.start();
+        exaggerateThread = new Thread(exaggerate);
+        exaggerateThread.start();
+        detectThread = new Thread(detect);
+        detectThread.start();
     }
 
     private void joinThreads(){
         try {
             filterThread.join();
+            exaggerateThread.join();
+            detectThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

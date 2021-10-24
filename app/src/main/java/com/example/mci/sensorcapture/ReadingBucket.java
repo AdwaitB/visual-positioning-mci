@@ -1,5 +1,7 @@
 package com.example.mci.sensorcapture;
 
+import static com.example.mci.utils.TimeUtils.getSystemTime;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Pair;
@@ -58,7 +60,7 @@ public class ReadingBucket {
     public static String getHeader(){
         StringBuilder builder = new StringBuilder();
 
-        builder.append("timestamp");
+        builder.append("Timestamp");
 
         for(String val : SENSOR_INDEX_TO_NAME.values())
             builder.append(',').append(val);
