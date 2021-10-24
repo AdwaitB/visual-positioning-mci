@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private static final Filter filter = new Filter(raw, filtered);
     private static final Exaggerate exaggerate = new Exaggerate(filtered, exaggerated);
-    private static final Detect detect = new Detect(exaggerated, detection);
+    private static final Detect detect = new Detect(exaggerated);
 
     private static Thread filterThread;
     private static Thread exaggerateThread;

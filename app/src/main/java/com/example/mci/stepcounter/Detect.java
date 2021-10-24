@@ -2,34 +2,31 @@ package com.example.mci.stepcounter;
 
 import com.example.mci.MainActivity;
 
-import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.List;
 
 public class Detect implements Runnable {
-    private final ArrayBlockingQueue<SensorReading> inputQueue, outputQueue;
+    private final static long STEP_DURATION_THRESHOLD = (long) 2e8;
+    private final static float MAGNITUDE_THRESHOLD = 1.2f;
+
+    private final ArrayBlockingQueue<SensorReading> inputQueue;
 
     private static int number_of_steps;
     private double mean;
     private double std;
     private int count;
 
-    private final float threshold = 1.2f;
-    private long lastSeen;
+    private SensorReading lastPeakReading;
 
     public Detect(
-            ArrayBlockingQueue<SensorReading> inputQueue,
-            ArrayBlockingQueue<SensorReading> outputQueue
+            ArrayBlockingQueue<SensorReading> inputQueue
     ) {
         this.inputQueue = inputQueue;
-        this.outputQueue = outputQueue;
-        lastSeen = 0;
+        lastPeakReading = null;
         number_of_steps = 0;
         mean = 0.0d;
         std = 0.0d;
         count = 0;
-
     }
 
     @Override
@@ -66,19 +63,20 @@ public class Detect implements Runnable {
                 }
 
                 if(count > 15) {
-                    if((inputReading.getMagnitude() - mean) > std * threshold) {
-                        if(lastSeen == 0) {
-                            lastSeen = inputReading.getTimestamp();
+                    if((inputReading.getMagnitude() - mean) > std * MAGNITUDE_THRESHOLD) {
+                        if(lastPeakReading == null) {
+                            lastPeakReading = inputReading;
                             number_of_steps++;
-                        } else if(inputReading.getTimestamp() - lastSeen > 300000000) {
-                            lastSeen = inputReading.getTimestamp();
+                        } else if (inputReading.getTimestamp() - lastPeakReading.getTimestamp() > STEP_DURATION_THRESHOLD) {
+                            lastPeakReading = inputReading;
                             number_of_steps++;
-                        }
+                        } else if(inputReading.getMagnitude() > lastPeakReading.getMagnitude())
+                            lastPeakReading = inputReading;
                     }
                 }
 
                 MainActivity.debug.setText(
-                        String.format("Steps: %s",Integer.toString(number_of_steps))
+                        String.format("Steps: %s\n", number_of_steps)
                 );
 
             } catch (InterruptedException e) {
