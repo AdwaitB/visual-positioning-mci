@@ -35,23 +35,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_GAME;
 
     private SensorManager sensorManager;
-    private HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
+    private static final HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
 
-    private ArrayList<Integer> samplingSizes;
-
+    private static final ArrayList<Integer> samplingSizes;
 
     private Button toggleBucketing, dumpData, checkfile, counter;
-    private Integer stepCount;
+    private Integer stepCount = 0;
 
-    public static Boolean stepActive;
+    public static Boolean stepActive = false;
 
-    private ArrayBlockingQueue<SensorReading> raw, filtered, exaggerated, detection;
-    private Filter filter;
-    private Exaggerate exaggerate;
-    private Detect detect;
-    private Thread filterThread;
-    private Thread exaggerateThread;
-    private Thread detectThread;
+    private static final ArrayBlockingQueue<SensorReading>
+            raw = new ArrayBlockingQueue<>(Short.MAX_VALUE),
+            filtered = new ArrayBlockingQueue<>(Short.MAX_VALUE),
+            exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE),
+            detection = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+
+    private static final Filter filter = new Filter(raw, filtered);
+    private static final Exaggerate exaggerate = new Exaggerate(filtered, exaggerated);
+    private static final Detect detect = new Detect(exaggerated, detection);
+
+    private static Thread filterThread;
+    private static Thread exaggerateThread;
+    private static Thread detectThread;
 
     private TextView x_acc, y_acc, z_acc;
     private TextView x_mag, y_mag, z_mag;
@@ -63,6 +68,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static TextView debug;
 
     boolean track = false;
+
+    static{
+        samplingSizes = new ArrayList<>();
+        samplingSizes.add(1);
+        samplingSizes.add(5);
+        samplingSizes.add(10);
+        samplingSizes.add(20);
+        samplingSizes.add(50);
+
+        sensorCaptureTasks = new HashMap<>();
+        for(int samplingSize : samplingSizes)
+            sensorCaptureTasks.put(samplingSize, new SensorCaptureTask(samplingSize));
+    }
 
     private void initViews(){
         time_acc = (TextView) findViewById(R.id.time_acc);
@@ -172,17 +190,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void initSensors(){
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 
-        samplingSizes = new ArrayList<>();
-        samplingSizes.add(1);
-        samplingSizes.add(5);
-        samplingSizes.add(10);
-        samplingSizes.add(20);
-        samplingSizes.add(50);
-
-        sensorCaptureTasks = new HashMap<>();
-        for(int samplingSize : samplingSizes)
-            sensorCaptureTasks.put(samplingSize, new SensorCaptureTask(samplingSize));
-
         sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -208,18 +215,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         );
     }
 
-    private void initStepCounter(){
-        raw = new ArrayBlockingQueue<>(Short.MAX_VALUE);
-        filtered = new ArrayBlockingQueue<>(Short.MAX_VALUE);
-        exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE);
-        detection = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        verifyStoragePermissions(this);
 
-        stepActive = false;
-        stepCount = 0;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        filter = new Filter(raw, filtered);
-        exaggerate = new Exaggerate(filtered, exaggerated);
-        detect = new Detect(exaggerated, detection);
+        initViews();
+        initButtons();
+        initSensors();
     }
 
     private File getFile(int prefix){
@@ -246,19 +251,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        verifyStoragePermissions(this);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        initViews();
-        initButtons();
-        initSensors();
-        initStepCounter();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
