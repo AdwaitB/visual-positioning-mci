@@ -10,7 +10,7 @@ import java.util.List;
 public class Exaggerate implements Runnable {
     private final ArrayBlockingQueue<SensorReading> inputQueue, outputQueue;
 
-    private ArrayList<SensorReading> frontier;
+    private final ArrayList<SensorReading> frontier;
     public final static Integer NUMBER_OF_SAMPLES = 35;
 
 
@@ -31,12 +31,12 @@ public class Exaggerate implements Runnable {
             try {
                 SensorReading inputReading = inputQueue.poll(100, TimeUnit.MICROSECONDS);
                 frontier.add(inputReading);
-
                 if(frontier.size() < NUMBER_OF_SAMPLES) continue;
 
                 double score = scorePeak(frontier);
+
                 SensorReading outputReading = new SensorReading(
-                        frontier.get(NUMBER_OF_SAMPLES / 2).getTimestamp(),
+                        frontier.get(NUMBER_OF_SAMPLES>>1).getTimestamp(),
                         score
                 );
                 frontier.remove(0);
@@ -56,17 +56,15 @@ public class Exaggerate implements Runnable {
     }
 
     private double scorePeak(ArrayList<SensorReading> data) {
-        int midpoint = (int)data.size() / 2;
+        int midpoint = (int) data.size() / 2;
         double diffLeft = 0.0d;
         double diffRight = 0.0d;
 
-        for(int i = 0; i < midpoint; i++) {
+        for(int i = 0; i < midpoint; i++)
             diffLeft += data.get(midpoint).getMagnitude() - data.get(i).getMagnitude();
-        }
 
-        for(int j = midpoint + 1; j < data.size(); j++) {
+        for(int j = midpoint + 1; j < data.size(); j++)
             diffRight += data.get(midpoint).getMagnitude() - data.get(j).getMagnitude();
-        }
 
         return (diffLeft + diffRight) / (NUMBER_OF_SAMPLES - 1);
     }

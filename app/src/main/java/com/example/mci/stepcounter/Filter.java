@@ -20,7 +20,7 @@ public class Filter implements Runnable {
     public final static Double BELL_DEVIATION = 0.35d;
 
     private final static int FRONTIER_MAX = (BELL_SIZE<<1)+1;
-    private List<SensorReading> frontier;
+    private final List<SensorReading> frontier;
 
     static {
         Double COEFF_SUM_TMP;
@@ -57,10 +57,8 @@ public class Filter implements Runnable {
             if(inputQueue.isEmpty()) continue;
             try {
                 SensorReading inputReading = inputQueue.poll(100, TimeUnit.MICROSECONDS);
-
                 frontier.add(inputReading);
-
-                if(frontier.size() <= FRONTIER_MAX) continue;
+                if(frontier.size() < FRONTIER_MAX) continue;
 
                 double total = 0;
                 for(int i = 0; i < FRONTIER_MAX; i++)

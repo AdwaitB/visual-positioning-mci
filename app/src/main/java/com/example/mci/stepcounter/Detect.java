@@ -39,7 +39,8 @@ public class Detect implements Runnable {
             try {
                 SensorReading inputReading = inputQueue.poll(100, TimeUnit.MICROSECONDS);
                 count++;
-                double o_mean = mean;
+                double oMean = mean;
+
                 switch(count) {
                     case 1:
                         mean = inputReading.getMagnitude();
@@ -47,11 +48,21 @@ public class Detect implements Runnable {
                         break;
                     case 2:
                         mean = (mean + inputReading.getMagnitude()) / 2;
-                        std = (float)Math.sqrt(Math.pow(inputReading.getMagnitude() - mean,2) + Math.pow(o_mean - mean,2)) / 2;
+                        std = (float) Math.sqrt(Math.pow(inputReading.getMagnitude() - mean, 2) +
+                                Math.pow(oMean - mean,2)) / 2;
                         break;
                     default:
-                        mean = (inputReading.getMagnitude() + (count - 1) * mean) / count;
-                        std = (float)Math.sqrt(((count - 2) * Math.pow(std,2) / (count - 1)) + Math.pow(o_mean - mean, 2) +  Math.pow(inputReading.getMagnitude() - mean,2) / count);
+                        mean = (inputReading.getMagnitude() + (count-1) * mean) / count;
+
+                        // online standard variance unbiased : Welford's online algorithm
+                        std = (float) Math.sqrt(
+                                ((count-2) * Math.pow(std, 2) / (count-1)) +
+
+                                // add unbiased factor to fix the numerical instability
+                                Math.pow(oMean - mean, 2) +
+                                Math.pow(inputReading.getMagnitude() - mean, 2) / count
+                        );
+                        break;
                 }
 
                 if(count > 15) {
