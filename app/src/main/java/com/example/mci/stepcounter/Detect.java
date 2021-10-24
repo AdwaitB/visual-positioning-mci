@@ -9,6 +9,9 @@ public class Detect implements Runnable {
     private final static long STEP_DURATION_THRESHOLD = (long) 2e8;
     private final static float MAGNITUDE_THRESHOLD = 1.2f;
 
+    private final double STD_MIN = 0.5f;
+    private final double STD_MAX = 1.5f;
+
     private final ArrayBlockingQueue<SensorReading> inputQueue;
 
     private double mean;
@@ -23,7 +26,7 @@ public class Detect implements Runnable {
         this.inputQueue = inputQueue;
         lastPeakReading = null;
         mean = 0.0d;
-        std = 0.0d;
+        std = (STD_MIN + STD_MAX)/2;
         count = 0;
     }
 
@@ -59,6 +62,9 @@ public class Detect implements Runnable {
                         );
                         break;
                 }
+
+                if(std > STD_MAX) std = STD_MAX;
+                if(std < STD_MIN) std = STD_MIN;
 
                 if(count > 15) {
                     if((inputReading.getMagnitude() - mean) > std * MAGNITUDE_THRESHOLD) {
