@@ -177,24 +177,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
         Button counterToggle = (Button) findViewById(R.id.counterToggle);
-        counterToggle.setText("START COUNTER");
+        counterToggle.setText("START\nCOUNTER");
         counterToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 AbstractStage.flipActive();
                 if(!AbstractStage.active){
                     joinThreads();
-                    counterToggle.setText("START COUNTER");
+                    counterToggle.setText("START\nCOUNTER");
                 }
                 else{
                     startThreads();
-                    counterToggle.setText("STOP COUNTER");
+                    counterToggle.setText("STOP\nCOUNTER");
                 }
             }
         });
     }
 
     public static void updateStepButton(){
-        counter.setText("STEPS (Click to reset): " + AbstractStage.stepCount);
+        counter.setText("STEPS: " + AbstractStage.stepCount + "\n(Click to reset)");
     }
 
     private void initSensors(){
