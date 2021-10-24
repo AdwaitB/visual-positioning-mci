@@ -74,7 +74,7 @@ public class Detect implements Runnable {
                 }
 
                 MainActivity.debug.setText(
-                        String.format("Mean: %f\n Deviation (unbiased): %f\n", mean, std)
+                        String.format("Mean: %f\nDeviation (unbiased): %f\n", mean, std)
                 );
                 MainActivity.updateStepButton();
 

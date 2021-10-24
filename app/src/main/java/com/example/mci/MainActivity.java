@@ -261,9 +261,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             this.time_acc.setText("Acc Time : " + sensorEvent.timestamp);
 
-            this.x_acc.setText("X acc: " + sensorEvent.values[0]);
-            this.y_acc.setText("Y acc: " + sensorEvent.values[1]);
-            this.z_acc.setText("Z acc: " + sensorEvent.values[2]);
+            this.x_acc.setText(formatSensorString("X", sensorEvent.values[0]));
+            this.y_acc.setText(formatSensorString("Y", sensorEvent.values[0]));
+            this.z_acc.setText(formatSensorString("Z", sensorEvent.values[0]));
 
             if(stepActive) {
                 try {
@@ -285,27 +285,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD){
             this.time_mag.setText("Gyro Time : " + sensorEvent.timestamp);
 
-            this.x_mag.setText("X acc: " + sensorEvent.values[0]);
-            this.y_mag.setText("Y acc: " + sensorEvent.values[1]);
-            this.z_mag.setText("Z acc: " + sensorEvent.values[2]);
+            this.x_mag.setText(formatSensorString("X", sensorEvent.values[0]));
+            this.y_mag.setText(formatSensorString("Y", sensorEvent.values[1]));
+            this.z_mag.setText(formatSensorString("Z", sensorEvent.values[2]));
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_GYROSCOPE){
             this.time_gyro.setText("Gyro Time : " + sensorEvent.timestamp);
 
-            this.x_gyro.setText("X acc: " + sensorEvent.values[0]);
-            this.y_gyro.setText("Y acc: " + sensorEvent.values[1]);
-            this.z_gyro.setText("Z acc: " + sensorEvent.values[2]);
+            this.x_gyro.setText(formatSensorString("X", sensorEvent.values[0]));
+            this.y_gyro.setText(formatSensorString("Y", sensorEvent.values[1]));
+            this.z_gyro.setText(formatSensorString("Z", sensorEvent.values[2]));
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT){
             this.time_light.setText("Light Time : " + sensorEvent.timestamp);
 
-            this.light.setText("Light: " + sensorEvent.values[0]);
+            this.light.setText(formatSensorString("Light", sensorEvent.values[0]));
         }
 
         if(track){
             for(SensorCaptureTask sensorCaptureTask : this.sensorCaptureTasks.values())
                 sensorCaptureTask.captureEntry(sensorEvent);
         }
+    }
+
+    private String formatSensorString(String prefix, float value){
+        return prefix + String.format(": %3.5f", value);
     }
 
     public static void updateStepButton(){
