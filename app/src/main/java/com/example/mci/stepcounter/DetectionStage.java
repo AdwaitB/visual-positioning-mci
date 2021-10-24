@@ -61,22 +61,31 @@ public class DetectionStage extends AbstractStage {
         if(std > STD_MAX) std = STD_MAX;
         if(std < STD_MIN) std = STD_MIN;
 
+        boolean updated = detectSteps(inputReading);
+
+        MainActivity.debug.setText(String.format("Mean: %f\nDeviation (unbiased): %f\n", mean, std));
+
+        if(updated)
+            MainActivity.updateStepButton();
+    }
+
+    private boolean detectSteps(SensorReading inputReading){
         if(count > 15) {
             if((inputReading.getMagnitude() - mean) > std * MAGNITUDE_THRESHOLD) {
                 if(lastPeakReading == null) {
                     lastPeakReading = inputReading;
-                    MainActivity.stepCount++;
-                } else if (inputReading.getTimestamp() - lastPeakReading.getTimestamp() > STEP_DURATION_THRESHOLD) {
+                    stepCount++;
+                    return true;
+                }
+                else if (inputReading.getTimestamp() - lastPeakReading.getTimestamp() > STEP_DURATION_THRESHOLD) {
                     lastPeakReading = inputReading;
-                    MainActivity.stepCount++;
-                } else if(inputReading.getMagnitude() > lastPeakReading.getMagnitude())
+                    stepCount++;
+                    return true;
+                }
+                else if(inputReading.getMagnitude() > lastPeakReading.getMagnitude())
                     lastPeakReading = inputReading;
             }
         }
-
-        MainActivity.debug.setText(
-                String.format("Mean: %f\nDeviation (unbiased): %f\n", mean, std)
-        );
-        MainActivity.updateStepButton();
+        return false;
     }
 }

@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.mci.sensorcapture.SensorCaptureTask;
+import com.example.mci.stepcounter.AbstractStage;
 import com.example.mci.stepcounter.FilteringStage;
 import com.example.mci.stepcounter.ExaggerationStage;
 import com.example.mci.stepcounter.DetectionStage;
@@ -39,14 +40,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private static final ArrayList<Integer> samplingSizes;
 
-    private Button toggleBucketing, dumpData, checkfile;
     private static Button counter;
 
     private static final ArrayBlockingQueue<SensorReading>
             raw = new ArrayBlockingQueue<>(Short.MAX_VALUE),
             filtered = new ArrayBlockingQueue<>(Short.MAX_VALUE),
-            exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE),
-            detection = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+            exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE);
 
     private static final FilteringStage filteringStage = new FilteringStage(raw, filtered);
     private static final ExaggerationStage exaggerationStage = new ExaggerationStage(filtered, exaggerated);
@@ -65,8 +64,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // public
     public static TextView debug;
-    public static Integer stepCount = 0;
-    public static Boolean stepActive = false;
 
     boolean track = false;
 
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void initButtons(){
-        toggleBucketing = (Button) findViewById(R.id.toggleBucketing);
+        Button toggleBucketing = (Button) findViewById(R.id.toggleBucketing);
         toggleBucketing.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -125,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        checkfile = (Button) findViewById(R.id.checkfile);
+        Button checkfile = (Button) findViewById(R.id.checkfile);
         checkfile.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -150,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        dumpData = (Button) findViewById(R.id.dumpData);
+        Button dumpData = (Button) findViewById(R.id.dumpData);
         dumpData.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -165,27 +162,33 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
         counter = (Button) findViewById(R.id.counter);
+        updateStepButton();
         counter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                stepCount = 0;
-                counter.setText(stepCount.toString());
+                AbstractStage.stepCount = 0;
+                updateStepButton();
             }
         });
 
-        counter.setOnLongClickListener(new View.OnLongClickListener() {
-            public boolean onLongClick(View view) {
-                stepActive = !stepActive;
-                if(!stepActive) {
-                    counter.setText("INACTIVE");
+        Button counterToggle = (Button) findViewById(R.id.counterToggle);
+        counterToggle.setText("START COUNTER");
+        counterToggle.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                AbstractStage.flipActive();
+                if(!AbstractStage.active){
                     joinThreads();
+                    counterToggle.setText("START COUNTER");
                 }
-                else {
-                    counter.setText(stepCount.toString());
+                else{
                     startThreads();
+                    counterToggle.setText("STOP COUNTER");
                 }
-                return true;
             }
         });
+    }
+
+    public static void updateStepButton(){
+        counter.setText("STEPS (Click to reset): " + AbstractStage.stepCount);
     }
 
     private void initSensors(){
@@ -264,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             this.y_acc.setText(formatSensorString("Y", sensorEvent.values[0]));
             this.z_acc.setText(formatSensorString("Z", sensorEvent.values[0]));
 
-            if(stepActive) {
+            if(AbstractStage.active) {
                 try {
                     SensorReading sensorReading = new SensorReading(
                             sensorEvent.timestamp,
@@ -309,13 +312,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private String formatSensorString(String prefix, float value){
         return prefix + String.format(": %3.5f", value);
-    }
-
-    public static void updateStepButton(){
-        if(!stepActive)
-            counter.setText("INACTIVE");
-        else
-            counter.setText(stepCount.toString());
     }
 
     @Override

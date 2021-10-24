@@ -7,6 +7,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 public abstract class AbstractStage implements Runnable {
     protected final ArrayBlockingQueue<SensorReading> inputQueue, outputQueue;
 
+    public static boolean active = false;
+    public static int stepCount = 0;
+
     public AbstractStage(ArrayBlockingQueue<SensorReading> inputQueue, ArrayBlockingQueue<SensorReading> outputQueue) {
         this.inputQueue = inputQueue;
         this.outputQueue = outputQueue;
@@ -14,7 +17,7 @@ public abstract class AbstractStage implements Runnable {
 
     @Override
     public void run() {
-        while(MainActivity.stepActive){
+        while(active){
             if(inputQueue.isEmpty()) continue;
             try {
                 runInterruptStep();
@@ -22,6 +25,10 @@ public abstract class AbstractStage implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void flipActive(){
+        active = !active;
     }
 
     abstract void runInterruptStep() throws InterruptedException;
