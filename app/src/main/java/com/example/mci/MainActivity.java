@@ -19,9 +19,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.mci.sensorcapture.SensorCaptureTask;
-import com.example.mci.stepcounter.Filter;
-import com.example.mci.stepcounter.Exaggerate;
-import com.example.mci.stepcounter.Detect;
+import com.example.mci.stepcounter.FilteringStage;
+import com.example.mci.stepcounter.ExaggerationStage;
+import com.example.mci.stepcounter.DetectionStage;
 import com.example.mci.stepcounter.SensorReading;
 
 import java.io.File;
@@ -42,17 +42,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Button toggleBucketing, dumpData, checkfile;
     private static Button counter;
 
-    public static Boolean stepActive = false;
-
     private static final ArrayBlockingQueue<SensorReading>
             raw = new ArrayBlockingQueue<>(Short.MAX_VALUE),
             filtered = new ArrayBlockingQueue<>(Short.MAX_VALUE),
             exaggerated = new ArrayBlockingQueue<>(Short.MAX_VALUE),
             detection = new ArrayBlockingQueue<>(Short.MAX_VALUE);
 
-    private static final Filter filter = new Filter(raw, filtered);
-    private static final Exaggerate exaggerate = new Exaggerate(filtered, exaggerated);
-    private static final Detect detect = new Detect(exaggerated);
+    private static final FilteringStage filteringStage = new FilteringStage(raw, filtered);
+    private static final ExaggerationStage exaggerationStage = new ExaggerationStage(filtered, exaggerated);
+    private static final DetectionStage detectionStage = new DetectionStage(exaggerated);
 
     private static Thread filterThread;
     private static Thread exaggerateThread;
@@ -68,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // public
     public static TextView debug;
     public static Integer stepCount = 0;
+    public static Boolean stepActive = false;
 
     boolean track = false;
 
@@ -237,11 +236,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void startThreads(){
-        filterThread = new Thread(filter);
+        filterThread = new Thread(filteringStage);
         filterThread.start();
-        exaggerateThread = new Thread(exaggerate);
+        exaggerateThread = new Thread(exaggerationStage);
         exaggerateThread.start();
-        detectThread = new Thread(detect);
+        detectThread = new Thread(detectionStage);
         detectThread.start();
     }
 
