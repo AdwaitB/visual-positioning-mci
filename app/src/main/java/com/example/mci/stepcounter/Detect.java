@@ -11,7 +11,6 @@ public class Detect implements Runnable {
 
     private final ArrayBlockingQueue<SensorReading> inputQueue;
 
-    private static int number_of_steps;
     private double mean;
     private double std;
     private int count;
@@ -23,7 +22,6 @@ public class Detect implements Runnable {
     ) {
         this.inputQueue = inputQueue;
         lastPeakReading = null;
-        number_of_steps = 0;
         mean = 0.0d;
         std = 0.0d;
         count = 0;
@@ -66,18 +64,19 @@ public class Detect implements Runnable {
                     if((inputReading.getMagnitude() - mean) > std * MAGNITUDE_THRESHOLD) {
                         if(lastPeakReading == null) {
                             lastPeakReading = inputReading;
-                            number_of_steps++;
+                            MainActivity.stepCount++;
                         } else if (inputReading.getTimestamp() - lastPeakReading.getTimestamp() > STEP_DURATION_THRESHOLD) {
                             lastPeakReading = inputReading;
-                            number_of_steps++;
+                            MainActivity.stepCount++;
                         } else if(inputReading.getMagnitude() > lastPeakReading.getMagnitude())
                             lastPeakReading = inputReading;
                     }
                 }
 
                 MainActivity.debug.setText(
-                        String.format("Steps: %s\n", number_of_steps)
+                        String.format("Mean: %f\n Deviation (unbiased): %f\n", mean, std)
                 );
+                MainActivity.updateStepButton();
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

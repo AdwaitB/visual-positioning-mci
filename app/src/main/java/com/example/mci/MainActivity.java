@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private static final ArrayList<Integer> samplingSizes;
 
-    private Button toggleBucketing, dumpData, checkfile, counter;
-    private Integer stepCount = 0;
+    private Button toggleBucketing, dumpData, checkfile;
+    private static Button counter;
 
     public static Boolean stepActive = false;
 
@@ -65,7 +65,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView light;
     private TextView status;
 
+    // public
     public static TextView debug;
+    public static Integer stepCount = 0;
 
     boolean track = false;
 
@@ -304,6 +306,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             for(SensorCaptureTask sensorCaptureTask : this.sensorCaptureTasks.values())
                 sensorCaptureTask.captureEntry(sensorEvent);
         }
+    }
+
+    public static void updateStepButton(){
+        if(!stepActive)
+            counter.setText("INACTIVE");
+        else
+            counter.setText(stepCount.toString());
     }
 
     @Override
