@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String FILENAME = "data.txt";
     private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_GAME;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
 
     private static final ArrayList<Integer> samplingSizes;
+
+    private static final Long SYS_TIME = SystemClock.elapsedRealtimeNanos();
 
     private static Button counter;
 
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView x_gyro, y_gyro, z_gyro;
     private TextView time_acc, time_mag, time_gyro, time_light;
     private TextView light;
-    private TextView status;
+    private TextView status, sys_time;
 
     // public
     public static TextView debug;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorCaptureTasks = new HashMap<>();
         for(int samplingSize : samplingSizes)
-            sensorCaptureTasks.put(samplingSize, new SensorCaptureTask(samplingSize));
+            sensorCaptureTasks.put(samplingSize, new SensorCaptureTask(samplingSize, SYS_TIME));
     }
 
     private void initViews(){
@@ -104,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         light = (TextView) findViewById(R.id.light);
 
         status = (TextView) findViewById(R.id.status);
+        sys_time = (TextView) findViewById(R.id.sys_time);
+        sys_time.setText(SYS_TIME.toString());
 
         debug = (TextView) findViewById(R.id.debug);
     }
@@ -261,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            this.time_acc.setText("Acc Time : " + sensorEvent.timestamp);
+            this.time_acc.setText("Acc Time : " + Long.toString(sensorEvent.timestamp-SYS_TIME));
 
             this.x_acc.setText(formatSensorString("X", sensorEvent.values[0]));
             this.y_acc.setText(formatSensorString("Y", sensorEvent.values[0]));
@@ -285,21 +291,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD){
-            this.time_mag.setText("Gyro Time : " + sensorEvent.timestamp);
+            this.time_mag.setText("Mag Time : " + Long.toString(sensorEvent.timestamp-SYS_TIME));
 
             this.x_mag.setText(formatSensorString("X", sensorEvent.values[0]));
             this.y_mag.setText(formatSensorString("Y", sensorEvent.values[1]));
             this.z_mag.setText(formatSensorString("Z", sensorEvent.values[2]));
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_GYROSCOPE){
-            this.time_gyro.setText("Gyro Time : " + sensorEvent.timestamp);
+            this.time_gyro.setText("Gyro Time : " + Long.toString(sensorEvent.timestamp-SYS_TIME));
 
             this.x_gyro.setText(formatSensorString("X", sensorEvent.values[0]));
             this.y_gyro.setText(formatSensorString("Y", sensorEvent.values[1]));
             this.z_gyro.setText(formatSensorString("Z", sensorEvent.values[2]));
         }
         else if(sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT){
-            this.time_light.setText("Light Time : " + sensorEvent.timestamp);
+            this.time_light.setText("Light Time : " + Long.toString(sensorEvent.timestamp-SYS_TIME));
 
             this.light.setText(formatSensorString("Light", sensorEvent.values[0]));
         }
