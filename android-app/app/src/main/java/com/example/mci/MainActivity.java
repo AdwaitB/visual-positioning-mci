@@ -6,12 +6,14 @@ import static com.example.mci.utils.TimeUtils.getSystemTime;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,6 +28,7 @@ import com.example.mci.stepcounter.FilteringStage;
 import com.example.mci.stepcounter.ExaggerationStage;
 import com.example.mci.stepcounter.DetectionStage;
 import com.example.mci.stepcounter.SensorReading;
+import com.example.mci.utils.WifiCapture;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String DATA_FILE_SUFFIX = "data.txt";
     private static final String AUDIO_FILENAME = "sound.3gp";
+    public static final String WIFI_FILE_PREFIX = "wifi.txt";
+
     private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_GAME;
 
     private SensorManager sensorManager;
@@ -62,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static Thread filterThread;
     private static Thread exaggerateThread;
     private static Thread detectThread;
+
+    private static Thread wifiCaptureThread;
 
     private TextView x_acc, y_acc, z_acc;
     private TextView x_mag, y_mag, z_mag;
@@ -132,11 +139,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                     track = true;
                     startAudioRecording();
+                    startWifiRecording();
 
                     toggleBucketing.setText("STOP RECORDING");
                 } else {
                     track = false;
                     stopAudioRecording();
+                    stopWifiRecoring();
 
                     for(Integer samplingSize : samplingSizes){
                         File file = getDataFile(samplingSize);
@@ -170,6 +179,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     updateStatusForFile(file, "delete");
                     if(file.exists()) file.delete();
                 }
+
+                File file = getAudioFile();
+                if(file.exists()) file.delete();
+
+                file = getWifiFile();
+                if(file.exists()) file.delete();
+
                 return true;
             }
         });
@@ -230,6 +246,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
                 SENSOR_LEVEL
         );
+
+        WifiCapture.applicationContext = getApplicationContext();
     }
 
     @Override
@@ -251,6 +269,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return file;
     }
 
+    private File getAudioFile(){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+
+        return new File(directory.getPath() + "/" + AUDIO_FILENAME);
+    }
+
+    private File getWifiFile(){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+
+        return new File(directory.getPath() + "/" + WIFI_FILE_PREFIX);
+    }
+
     private void startThreads(){
         filterThread = new Thread(filteringStage);
         filterThread.start();
@@ -266,7 +298,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             exaggerateThread.join();
             detectThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            debug.append(e.getMessage());
+        }
+    }
+
+    private void startWifiRecording(){
+        WifiCapture.active = true;
+        WifiCapture.wifiFile = getWifiFile();
+
+        wifiCaptureThread = new Thread(new WifiCapture(SYS_TIME));
+        wifiCaptureThread.start();
+    }
+
+    private void stopWifiRecoring(){
+        try {
+            WifiCapture.active = false;
+            wifiCaptureThread.join();
+        } catch (InterruptedException e) {
+            debug.append(e.getMessage());
         }
     }
 
@@ -296,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mediaRecorder.release();
     }
 
-    private void appendLog(String log){
+    public static void appendLog(String log){
         debug.append("\n-----------------\n");
         debug.append(log);
     }

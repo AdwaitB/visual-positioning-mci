@@ -14,6 +14,7 @@ public class MiscUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             verifyPermission(activity, Manifest.permission.CAPTURE_AUDIO_OUTPUT, 1);
         }
+        verifyPermission(activity, Manifest.permission.ACCESS_WIFI_STATE, 1);
     }
 
     public static void verifyPermission(
