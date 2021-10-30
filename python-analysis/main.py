@@ -6,6 +6,8 @@ TIME_OF_DAY = [1,2]
 
 PREFIX_FOLDER = "img/"
 
+ASPECT_RATIO = 4/3
+
 def generateImgPaths():
     ans = []
     
@@ -18,13 +20,16 @@ def generateImgPaths():
 
 def generateFeaturePointsToFile(path):
     img = cv2.imread(path + ".jpg")
+    size = 1024
+    resized = cv2.resize(img, (int(ASPECT_RATIO*size), size), interpolation = cv2.INTER_AREA)
+
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Applying SIFT detector
     sift = cv2.xfeatures2d.SIFT_create()
-    kp = sift.detect(img, None)
+    kp = sift.detect(resized, None)
 
-    img = cv2.drawKeypoints(img, kp, img, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    cv2.imwrite(path + "-fp.jpg", img)
+    resized = cv2.drawKeypoints(resized, kp, resized, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    cv2.imwrite(path + "-fp.jpg", resized)
 
 
 def main():
