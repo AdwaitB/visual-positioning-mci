@@ -41,9 +41,9 @@
         android:layout_marginLeft="10dp"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        android:text="START"
+        android:text="START RECORDING"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/dumpData"
+        app:layout_constraintEnd_toStartOf="@+id/checkfile"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -62,7 +62,7 @@
 
     <Button
         android:id="@+id/checkfile"
-        android:layout_width="0dp"
+        android:layout_width="128dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
@@ -71,19 +71,6 @@
         android:text="CHECK"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dumpData" />
-
-    <Button
-        android:id="@+id/dumpData"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:text="DUMP"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/checkfile"
         app:layout_constraintStart_toEndOf="@+id/toggleBucketing" />
 
     <TextView
@@ -229,7 +216,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        android:text="INACTIVE"
+        android:text="STEPS: 0\n(CLICK TO RESET)"
         android:textColor="@color/white"
         app:backgroundTint="#039BE5"
         app:layout_constraintBottom_toTopOf="@+id/toggleBucketing"
@@ -254,13 +241,13 @@
 
     <Button
         android:id="@+id/counterToggle"
-        android:layout_width="wrap_content"
+        android:layout_width="128dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        android:text="START COUNTER"
+        android:text="START\nCOUNTER"
         android:textColor="@color/white"
         app:backgroundTint="#039BE5"
         app:layout_constraintBottom_toTopOf="@+id/checkfile"

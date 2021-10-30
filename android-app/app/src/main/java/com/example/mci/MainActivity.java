@@ -1,6 +1,6 @@
 package com.example.mci;
 
-import static com.example.mci.utils.MiscUtils.verifyStoragePermissions;
+import static com.example.mci.utils.MiscUtils.verifyPermissions;
 import static com.example.mci.utils.TimeUtils.getSystemTime;
 
 import androidx.annotation.RequiresApi;
@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,16 +29,19 @@ import com.example.mci.stepcounter.SensorReading;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
-    private static final String FILENAME = "data.txt";
+    private static final String DATA_FILE_SUFFIX = "data.txt";
+    private static final String AUDIO_FILENAME = "sound.3gp";
     private Integer SENSOR_LEVEL = SensorManager.SENSOR_DELAY_GAME;
 
     private SensorManager sensorManager;
+    private MediaRecorder mediaRecorder;
     private static final HashMap<Integer, SensorCaptureTask> sensorCaptureTasks;
 
     private static final ArrayList<Integer> samplingSizes;
@@ -120,10 +124,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                track = true;
-                for(Integer samplingSize : samplingSizes){
-                    File file = getFile(samplingSize);
-                    updateStatusForFile(file, "track");
+                if(!track) {
+                    for (Integer samplingSize : samplingSizes) {
+                        File file = getDataFile(samplingSize);
+                        updateStatusForFile(file, "track");
+                    }
+
+                    track = true;
+                    startAudioRecording();
+
+                    toggleBucketing.setText("STOP RECORDING");
+                } else {
+                    track = false;
+                    stopAudioRecording();
+
+                    for(Integer samplingSize : samplingSizes){
+                        File file = getDataFile(samplingSize);
+                        sensorCaptureTasks.get(samplingSize).serialize(file);
+                        updateStatusForFile(file, "dumped");
+                    }
+
+                    toggleBucketing.setText("START RECORDING");
                 }
             }
         });
@@ -134,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View view) {
                 for(Integer samplingSize : samplingSizes){
-                    File file = getFile(samplingSize);
+                    File file = getDataFile(samplingSize);
                     updateStatusForFile(file, "check");
                 }
             }
@@ -145,25 +166,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public boolean onLongClick(View v) {
                 for(Integer samplingSize : samplingSizes){
-                    File file = getFile(samplingSize);
+                    File file = getDataFile(samplingSize);
                     updateStatusForFile(file, "delete");
                     if(file.exists()) file.delete();
                 }
                 return true;
-            }
-        });
-
-        Button dumpData = (Button) findViewById(R.id.dumpData);
-        dumpData.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
-                track = false;
-                for(Integer samplingSize : samplingSizes){
-                    File file = getFile(samplingSize);
-                    sensorCaptureTasks.get(samplingSize).serialize(file);
-                    updateStatusForFile(file, "dumped");
-                }
             }
         });
 
@@ -227,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        verifyStoragePermissions(this);
+        verifyPermissions(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -237,10 +244,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         initSensors();
     }
 
-    private File getFile(int prefix){
+    private File getDataFile(int prefix){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(directory, prefix + "_" + FILENAME);
+        File file = new File(directory, prefix + "_" + DATA_FILE_SUFFIX);
         return file;
     }
 
@@ -261,6 +268,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void startAudioRecording(){
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+
+        mediaRecorder.setOutputFile(directory.getPath() + "/" + AUDIO_FILENAME);
+
+        try {
+            mediaRecorder.prepare();
+        } catch (Exception e) {
+            appendLog(e.getMessage());
+            appendLog(Arrays.toString(e.getStackTrace()));
+        }
+
+        mediaRecorder.start();
+    }
+
+    private void stopAudioRecording(){
+        mediaRecorder.stop();
+        mediaRecorder.release();
+    }
+
+    private void appendLog(String log){
+        debug.append("\n-----------------\n");
+        debug.append(log);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
