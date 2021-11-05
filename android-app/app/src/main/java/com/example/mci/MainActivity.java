@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,8 +19,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mci.sensorcapture.SensorCaptureTask;
@@ -30,7 +33,11 @@ import com.example.mci.stepcounter.DetectionStage;
 import com.example.mci.stepcounter.SensorReading;
 import com.example.mci.utils.WifiCapture;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -212,6 +219,66 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     startThreads();
                     counterToggle.setText("STOP\nCOUNTER");
                 }
+            }
+        });
+
+        Button UploadButton = (Button) findViewById(R.id.UploadButton);
+        UploadButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View view) {
+                Thread thread = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            String serverAddr = "172.20.10.4";
+                            int port = 7894;
+                            Socket socket = new Socket(serverAddr, port);
+
+                            String[] projection = new String[]{
+                                    MediaStore.Images.ImageColumns._ID,
+                                    MediaStore.Images.ImageColumns.DATA,
+                                    MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                                    MediaStore.Images.ImageColumns.DATE_TAKEN,
+                                    MediaStore.Images.ImageColumns.MIME_TYPE
+                            };
+                            final Cursor cursor = MainActivity.this.getContentResolver()
+                                    .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+                                            null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+
+                            String filename = "";
+
+                            if (cursor.moveToFirst()) {
+                                filename = cursor.getString(1);
+                            }
+
+                            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                            FileInputStream fis = new FileInputStream(filename);
+                            int size = fis.available();
+
+
+
+                            byte[] data = new byte[size];
+                            fis.read(data);
+                            dos.writeInt(size);
+                            dos.write(data);
+
+                            dos.flush();
+                            dos.close();
+                            fis.close();
+                            socket.close();
+                        } catch (Exception e) {
+                            debug.append(e.getMessage());
+                            int a;
+                        }
+
+
+
+
+                    }
+                });
+                thread.start();
             }
         });
     }
