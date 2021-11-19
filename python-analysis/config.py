@@ -2,15 +2,17 @@ NPOINTS = 10
 
 SEED = 1
 
-# Not just used for plot colors, also used as tags
-DATA_POINT_COLOR_DEFAULT = 'lightblue'
-DATA_POINT_COLOR_SEMI_1 = 'crimson'
-DATA_POINT_COLOR_SEMI_2 = 'fuchsia'
-DATA_POINT_COLOR_VIEW = 'black'
+DEBUG_LEVEL = 0
 
-DATA_EDGE_COLOR_DEFAULT = 'lightblue'
-DATA_EDGE_COLOR_SEMI = 'dodgerblue'
-DATA_EDGE_COLOR_VIEW = 'black'
+# Used mainly as tags, repurposed as colors to plot
+POINT_DEFAULT = 'lightblue'
+POINT_SEMI_1 = 'crimson'
+POINT_SEMI_2 = 'fuchsia'
+POINT_VIEW = 'black'
+
+EDGE_DEFAULT = 'lightblue'
+EDGE_SPLIT = 'dodgerblue'
+EDGE_VIEW = 'black'
 
 ORIGIN_COLOR = 'lime'
 VIEWPOINT_COLOR = 'orange'
@@ -22,5 +24,5 @@ AXIS_EDGE_COLOR = 'lightgreen'
 FOV = 70
 RADIUS = 6.5
 
-ORIGIN = [4, 4.5]
-DIRECTION = [1, -1]
+ORIGIN = [0, 2]
+DIRECTION = [1, 1]

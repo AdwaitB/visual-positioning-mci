@@ -14,13 +14,15 @@ def generate_data(count):
         x.append(rd.randrange(1000)/100.0)
         y.append(rd.randrange(1000)/100.0)
 
-    return pd.DataFrame({'x': x, 'y': y})
+    return pd.DataFrame({'x': x, 'y': y, 'color': [EDGE_DEFAULT] * len(x)})
 
 
 def get_edges():
     if SEED == 1:
-        return pd.DataFrame({
+        ret = pd.DataFrame({
             'start': [0, 0, 4, 4, 6, 6, 2, 2],
             'end': [9, 8, 5, 1, 5, 1, 3, 7],
-            'color': [DATA_EDGE_COLOR_DEFAULT] * 8
         })
+
+        ret['color'] = [EDGE_DEFAULT] * len(ret)
+        return ret

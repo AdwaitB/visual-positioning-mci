@@ -1,10 +1,6 @@
 import math
 
-import random as rd
-import numpy as np
-import pandas as pd
-
-from pprint import pprint
+from config import DEBUG_LEVEL
 
 
 def get_angle(point):
@@ -107,8 +103,8 @@ def check_edge_overlap(edges, points, e1, e2, origin):
 
     angle_overlap = (angle_1[0] <= angle_2[0]) and (angle_1[1] >= angle_2[1])
 
-    print()
-    print(angle_1, " ", angle_2, " ", angle_overlap)
+    if DEBUG_LEVEL >= 1:
+        print(angle_1, " ", angle_2, " ", angle_overlap)
 
     # Now check distance min
     min_1 = min(
@@ -139,6 +135,7 @@ def check_edge_overlap(edges, points, e1, e2, origin):
 
     distance_check = min_1 <= min_2
 
-    print(min_1, " ", min_2, " ", distance_check)
+    if DEBUG_LEVEL >= 1:
+        print(min_1, " ", min_2, " ", distance_check)
 
     return angle_overlap and distance_check
