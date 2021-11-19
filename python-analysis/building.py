@@ -77,7 +77,7 @@ def get_building_set(points, edge_ids_list):
     return id_to_build_map, buildings
 
 
-def split_edges_building(points, edge_ids_list, buildings, building_id):
+def split_edges_building(points, edges_list, buildings, building_id):
     invalid_edges = set()
     valid_edges = set()
 
@@ -104,7 +104,7 @@ def split_edges_building(points, edge_ids_list, buildings, building_id):
 
     for point in points_temp:
         print("in ", point)
-        for [other_node, edge_id] in edge_ids_list[point[2]]:
+        for [other_node, edge_id] in edges_list[point[2]]:
             if edge_id in valid_edges or edge_id in invalid_edges:
                 continue
 

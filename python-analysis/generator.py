@@ -17,7 +17,7 @@ def generate_data(count):
     return pd.DataFrame({'x': x, 'y': y})
 
 
-def get_edge_ids():
+def get_edges():
     if SEED == 1:
         return pd.DataFrame({
             'start': [0, 0, 4, 4, 6, 6, 2, 2],

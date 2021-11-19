@@ -26,7 +26,7 @@ def normalize_vector(point):
     return [x/size, y/size]
 
 
-def rotate_point(base, point, angle):
+def rotate_point(point, base, angle):
     s = math.sin(angle * math.pi / 180)
     c = math.cos(angle * math.pi / 180)
 
@@ -73,7 +73,7 @@ def get_line(p1, p2):
     return [m, -1, p1[1] - m*p1[0]]
 
 
-def get_distance(line, point):
+def get_perp_distance(line, point):
     num = line[0] * point[0] + line[1] * point[1] + line[3]
     if num < -1:
         num = num * (-1)
@@ -91,16 +91,16 @@ def get_distance_points(p1, p2):
 
 
 def get_perp_distance_points(p1, p2, point):
-    return get_distance(get_line(p1, p2), point)
+    return get_perp_distance(get_line(p1, p2), point)
 
 
-def check_edge_overlap(edge_ids, points, e1, e2, origin):
+def check_edge_overlap(edges, points, e1, e2, origin):
     # First check angle subset
-    angle_1 = [points['normalized_angle'][edge_ids.iloc[e1]['start']],
-               points['normalized_angle'][edge_ids.iloc[e1]['end']]]
+    angle_1 = [points['normalized_angle'][edges.iloc[e1]['start']],
+               points['normalized_angle'][edges.iloc[e1]['end']]]
 
-    angle_2 = [points['normalized_angle'][edge_ids.iloc[e2]['start']],
-               points['normalized_angle'][edge_ids.iloc[e2]['end']]]
+    angle_2 = [points['normalized_angle'][edges.iloc[e2]['start']],
+               points['normalized_angle'][edges.iloc[e2]['end']]]
 
     angle_1.sort()
     angle_2.sort()
@@ -114,26 +114,26 @@ def check_edge_overlap(edge_ids, points, e1, e2, origin):
     min_1 = min(
         get_distance_points(
             [
-                points['x'][edge_ids.iloc[e1]['start']],
-                points['y'][edge_ids.iloc[e1]['start']]
+                points['x'][edges.iloc[e1]['start']],
+                points['y'][edges.iloc[e1]['start']]
             ], origin),
         get_distance_points(
             [
-                points['x'][edge_ids.iloc[e1]['end']],
-                points['y'][edge_ids.iloc[e1]['end']]
+                points['x'][edges.iloc[e1]['end']],
+                points['y'][edges.iloc[e1]['end']]
             ], origin)
     )
 
     min_2 = min(
         get_distance_points(
             [
-                points['x'][edge_ids.iloc[e2]['start']],
-                points['y'][edge_ids.iloc[e2]['start']]
+                points['x'][edges.iloc[e2]['start']],
+                points['y'][edges.iloc[e2]['start']]
             ], origin),
         get_distance_points(
             [
-                points['x'][edge_ids.iloc[e2]['end']],
-                points['y'][edge_ids.iloc[e2]['end']]
+                points['x'][edges.iloc[e2]['end']],
+                points['y'][edges.iloc[e2]['end']]
             ], origin)
     )
 
