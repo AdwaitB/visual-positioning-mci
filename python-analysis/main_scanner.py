@@ -72,4 +72,14 @@ print_util(spans)
 
 ###################
 
+remove_overshadowing_edges(points, edges)
+print_util(edges)
+
+###################
+
+remove_overshadowing_edges_spans(points, edges, spans)
+print_util(edges)
+
+###################
+
 plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn)

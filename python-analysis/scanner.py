@@ -59,7 +59,7 @@ def tag_edges_fov(points, edges):
     edges['color'] = colors
 
 
-def tag_boundary_edges(points, edges):
+def remove_overshadowing_edges(points, edges):
     colors = [x for x in edges['color']]
 
     # Can be optimized to linear time using topo sort
@@ -84,33 +84,24 @@ def tag_boundary_edges(points, edges):
     edges['color'] = colors
 
 
-def tag_feasible_edges(points, edges, edges_list, buildings, id_to_build_map):
-    points_temp = []
-    building_ids = set()
-
+def remove_overshadowing_edges_spans(points, edges, spans):
     colors = [x for x in edges['color']]
 
-    for i, point in points.iterrows():
-        if point['color'] != POINT_VIEW:
-            continue
+    # Can be optimized to linear time using topo sort
+    for i in spans:
+        span_points = spans[i]
 
-        points_temp.append([
-            get_distance_points(ORIGIN, [point['x'], point['y']]),
-            point['normalized_angle'], i, point['x'], point['y']
-        ])
+        # Check if this edge is not overlappable
+        for j, ej in edges.iterrows():
+            if ej['color'] == EDGE_DEFAULT:
+                continue
 
-        building_ids.add(id_to_build_map[i])
+            if check_edge_overlap_semi(edges, points, j, span_points[0], span_points[1], ORIGIN):
+                colors[j] = EDGE_DEFAULT
 
-    if DEBUG_LEVEL >= 1:
-        print(building_ids)
-    points_temp.sort()
+                if DEBUG_LEVEL >= 1:
+                    print(j, " overlaps ", j)
 
-    for building_id in building_ids:
-        valid, invalid = split_edges_building(points, edges_list, buildings, building_id)
-
-        for edge_id in invalid:
-            colors[edge_id] = EDGE_DEFAULT
+                break
 
     edges['color'] = colors
-    return
-
