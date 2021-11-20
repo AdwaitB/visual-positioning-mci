@@ -12,16 +12,20 @@ from plot import *
 from building import *
 from config import *
 from generator import *
-from dbutils import *
+from db_utils import *
 from scanner import *
 from misc_utils import *
 
 ###################
 
-points = generate_data(NPOINTS)
-print_util(points, "points")
+if ORIGINAL_DATA:
+    points = read_points()
+    edges = read_edges(points)
+else:
+    points = generate_data(NPOINTS)
+    edges = get_edges()
 
-edges = get_edges()
+print_util(points, "points")
 print_util(edges, "edges")
 
 edges_mat = get_adj_mat(points, edges)
@@ -68,17 +72,17 @@ print_util(buildings, "buildings")
 ###################
 
 spans = get_spans(points, edges, edges_list, buildings)
-print_util(spans)
+print_util(spans, "spans")
 
 ###################
 
 remove_overshadowing_edges(points, edges)
-print_util(edges)
+print_util(edges, "edges after overshadow filter")
 
 ###################
 
 remove_overshadowing_edges_spans(points, edges, spans)
-print_util(edges)
+print_util(edges, "edges after spanned overshadow filter")
 
 ###################
 

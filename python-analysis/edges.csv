@@ -1,0 +1,6 @@
+tag,p1_tag,p2_tag,direction,virtual
+culc_main_entrance,culc0,culc1,N,0
+culc_back_1,culc1,culc2,E,0
+culc_connector,culc2,culc3,E,1
+culc_back_entrance,culc3,culc4,S,0
+culc_tg,culc4,culc0,W,0

@@ -54,31 +54,31 @@ def split_edges_building(points, edges, edges_list, building):
     invalid_edges = set()
     valid_edges = set()
 
-    points_temp = []
+    points_sorted = []
 
     for point_id in building:
         point = points.iloc[point_id]
 
         if not np.isnan(point['normalized_angle']):
-            points_temp.append([
+            points_sorted.append([
                 get_distance_points(ORIGIN, [point['x'], point['y']]),
                 point['normalized_angle'], point_id, point['x'], point['y']
             ])
 
-    points_temp.sort()
+    points_sorted.sort()
 
-    if len(points_temp) == 0:
+    if len(points_sorted) == 0:
         return invalid_edges, valid_edges
 
-    print_util(points_temp)
+    print_util(points_sorted)
 
-    if len(points_temp) == 0:
+    if len(points_sorted) == 0:
         return valid_edges, invalid_edges
 
-    angle_start = points_temp[0][1]
-    angle_end = points_temp[0][1]
+    angle_start = points_sorted[0][1]
+    angle_end = points_sorted[0][1]
 
-    for point in points_temp:
+    for point in points_sorted:
         if DEBUG_LEVEL >= 1:
             print("in ", point)
 
@@ -117,12 +117,12 @@ def split_edges_building(points, edges, edges_list, building):
                 print(other_node, " ", edge_id, " ", angle_start, " ", angle_end)
 
     edges['color'] = colors
-    return list(valid_edges), list(invalid_edges)
+    return list(valid_edges), list(invalid_edges), points_sorted[0][2]
 
 
-def collect_span(span_edges, edges, points):
+def collect_span(span_edges, start_point, edges, points):
     if len(span_edges) == 0:
-        return [np.nan, np.nan]
+        return [start_point, start_point]
 
     span_start_pt = edges['start'][span_edges[0]]
     span_end_pt = edges['start'][span_edges[0]]
@@ -154,14 +154,14 @@ def get_spans(points, edges, edges_list, buildings):
     ret = {}
 
     for i in buildings.keys():
-        valid, invalid = split_edges_building(points, edges, edges_list, buildings[i])
+        valid, invalid, start_point = split_edges_building(points, edges, edges_list, buildings[i])
 
         if DEBUG_LEVEL >= 1:
             print_util(i, "building ")
             print_util(valid, "valid")
             print_util(invalid, "invalid")
 
-        span = collect_span(valid, edges, points)
+        span = collect_span(valid, start_point, edges, points)
 
         if DEBUG_LEVEL >= 1:
             print_util(span, "span")

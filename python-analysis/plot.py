@@ -27,13 +27,17 @@ def generate_edge_point_raw(p1, p2):
 
 def plot_point(point, color, text=""):
     plt.scatter(point[0], point[1], c=color)
-    plt.text(point[0] + 0.1, point[1] + 0.1, text)
+
+    if text != "":
+        plt.text(point[0] + DIFF, point[1] + DIFF, text)
 
 
 def plot_edge(p1, p2, color, text=""):
     p = generate_edge_point_raw(p1, p2)
     plt.plot(p[0], p[1], linestyle="--", c=color)
-    plt.text((p1[0] + p2[0])/2 + 0.1, (p1[1] + p2[1])/2 + 0.1, text)
+
+    if text != "":
+        plt.text((p1[0] + p2[0])/2 + DIFF, (p1[1] + p2[1])/2 + DIFF, text)
 
 
 def plot_situation(points, edge_ids, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
@@ -41,11 +45,14 @@ def plot_situation(points, edge_ids, viewpoint, viewpoint_begin, viewpoint_end, 
 
     # Plot the building edges
     for index, edge_id in edge_ids.iterrows():
-        plot_edge(points.iloc[edge_id[0]], points.iloc[edge_id[1]], edge_id['color'], index)
+        plot_edge(points.iloc[edge_id['start']], points.iloc[edge_id['end']], edge_id['color'], index)
 
     # Plot the points
     for index, row in points.iterrows():
-        plot_point([row['x'], row['y']], row['color'], index)
+        plot_point([row['x'], row['y']], row['color'], "adwait")
+
+    plt.show()
+    return
 
     # Plot the origin
     plt.scatter(ORIGIN[0], ORIGIN[1], c=ORIGIN_COLOR)

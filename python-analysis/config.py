@@ -4,6 +4,8 @@ SEED = 1
 
 DEBUG_LEVEL = 0
 
+ORIGINAL_DATA = True
+
 # Used mainly as tags, repurposed as colors to plot
 POINT_DEFAULT = 'lightblue'
 POINT_SEMI_1 = 'crimson'
@@ -22,7 +24,18 @@ AXIS_POINT_COLOR = 'lightgreen'
 AXIS_EDGE_COLOR = 'lightgreen'
 
 FOV = 70
-RADIUS = 6.5
 
-ORIGIN = [0, 2]
+if ORIGINAL_DATA:
+    RADIUS = 0.003
+    ORIGIN = [33.77435829374495, -84.397344643052]
+    ORIGIN.reverse()
+
+    DIFF = 0.001
+else:
+    RADIUS = 6.5
+    ORIGIN = [4, 4]
+
+    DIFF = 0.1
+
+
 DIRECTION = [1, 1]
