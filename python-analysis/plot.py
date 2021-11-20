@@ -44,7 +44,11 @@ def plot_edge(p1, p2, color, text=""):
 def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
     print_util(points)
     print_util(edges)
-    # plt.rcParams["figure.autolayout"] = True
+
+    plt.xlim([ORIGIN[0] - RADIUS*1.1, ORIGIN[0] + RADIUS*1.1])
+    plt.ylim([ORIGIN[1] - RADIUS*1.1, ORIGIN[1] + RADIUS*1.1])
+
+    plt.rcParams["figure.autolayout"] = True
 
     # Plot the building edges
     for index, edge in edges.iterrows():
@@ -77,9 +81,6 @@ def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axi
     y = RADIUS * np.sin(angle) + ORIGIN[1]
 
     plt.plot(x, y, linestyle="--", c=AXIS_EDGE_COLOR)
-
-    # plt.ylim([ORIGIN[1] - RADIUS*1.1, ORIGIN[1] + RADIUS*1.1])
-    # plt.xlim([ORIGIN[0] - RADIUS*1.1, ORIGIN[0] + RADIUS*1.1])
 
     plt.grid(True)
 

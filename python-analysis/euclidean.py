@@ -1,6 +1,6 @@
 import math
 
-from config import DEBUG_LEVEL
+from config import *
 
 
 def get_angle(point):
@@ -44,6 +44,8 @@ def normalize_angle(reference, angle):
     ret = angle - reference
     if ret < 0:
         ret += 360
+    if ret > 360:
+        ret -= 360
     return ret
 
 
@@ -90,13 +92,18 @@ def get_perp_distance_points(p1, p2, point):
     return get_perp_distance(get_line(p1, p2), point)
 
 
-def check_edge_overlap(edges, points, e1, e2, origin):
-    # First check angle subset
-    angle_1 = [points['normalized_angle'][edges.iloc[e1]['start']],
-               points['normalized_angle'][edges.iloc[e1]['end']]]
+def check_edge_overlap(points, p11, p12, p21, p22):
+    if (p11 == p21) and (p12 == p22):
+        return False
+    elif (p11 == p22) and (p12 == p21):
+        return False
 
-    angle_2 = [points['normalized_angle'][edges.iloc[e2]['start']],
-               points['normalized_angle'][edges.iloc[e2]['end']]]
+    # First check angle subset
+    angle_1 = [points['normalized_angle'][p11],
+               points['normalized_angle'][p12]]
+
+    angle_2 = [points['normalized_angle'][p21],
+               points['normalized_angle'][p22]]
 
     angle_1.sort()
     angle_2.sort()
@@ -110,79 +117,27 @@ def check_edge_overlap(edges, points, e1, e2, origin):
     min_1 = min(
         get_distance_points(
             [
-                points['x'][edges.iloc[e1]['start']],
-                points['y'][edges.iloc[e1]['start']]
-            ], origin),
+                points['x'][p11],
+                points['y'][p11]
+            ], ORIGIN),
         get_distance_points(
             [
-                points['x'][edges.iloc[e1]['end']],
-                points['y'][edges.iloc[e1]['end']]
-            ], origin)
+                points['x'][p12],
+                points['y'][p12]
+            ], ORIGIN)
     )
 
     min_2 = min(
         get_distance_points(
             [
-                points['x'][edges.iloc[e2]['start']],
-                points['y'][edges.iloc[e2]['start']]
-            ], origin),
+                points['x'][p21],
+                points['y'][p21]
+            ], ORIGIN),
         get_distance_points(
             [
-                points['x'][edges.iloc[e2]['end']],
-                points['y'][edges.iloc[e2]['end']]
-            ], origin)
-    )
-
-    distance_check = min_1 <= min_2
-
-    if DEBUG_LEVEL >= 1:
-        print(min_1, " ", min_2, " ", distance_check)
-
-    return angle_overlap and distance_check
-
-
-# This is repeated and dirty code, refactor this to be same as before
-def check_edge_overlap_semi(edges, points, e1, p1, p2, origin):
-    # First check angle subset
-    angle_1 = [points['normalized_angle'][edges.iloc[e1]['start']],
-               points['normalized_angle'][edges.iloc[e1]['end']]]
-
-    angle_2 = [points['normalized_angle'][p1],
-               points['normalized_angle'][p2]]
-
-    angle_1.sort()
-    angle_2.sort()
-
-    angle_overlap = (angle_1[0] <= angle_2[0]) and (angle_1[1] >= angle_2[1])
-
-    if DEBUG_LEVEL >= 1:
-        print(angle_1, " ", angle_2, " ", angle_overlap)
-
-    # Now check distance min
-    min_1 = min(
-        get_distance_points(
-            [
-                points['x'][edges.iloc[e1]['start']],
-                points['y'][edges.iloc[e1]['start']]
-            ], origin),
-        get_distance_points(
-            [
-                points['x'][edges.iloc[e1]['end']],
-                points['y'][edges.iloc[e1]['end']]
-            ], origin)
-    )
-
-    min_2 = min(
-        get_distance_points(
-            [
-                points['x'][p1],
-                points['y'][p1]
-            ], origin),
-        get_distance_points(
-            [
-                points['x'][p2],
-                points['y'][p2]
-            ], origin)
+                points['x'][p22],
+                points['y'][p22]
+            ], ORIGIN)
     )
 
     distance_check = min_1 <= min_2
