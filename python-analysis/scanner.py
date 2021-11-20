@@ -96,7 +96,7 @@ def remove_overshadowing_edges_spans(points, edges, spans):
             if ej['color'] == EDGE_DEFAULT:
                 continue
 
-            if check_edge_overlap(points, edges['start'][j], edges['end'][j], span_points[0], span_points[1]):
+            if check_edge_overlap(points, span_points[0], span_points[1], edges['start'][j], edges['end'][j]):
                 colors[j] = EDGE_DEFAULT
 
                 if DEBUG_LEVEL >= 1:

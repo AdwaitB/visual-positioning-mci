@@ -30,7 +30,7 @@ def plot_point(point, color, text=""):
     plt.scatter(point[0], point[1], c=color)
 
     if text != "":
-        plt.text(point[0], point[1], text)
+        plt.text(point[0], point[1], text, clip_on=True)
 
 
 def plot_edge(p1, p2, color, text=""):
@@ -38,7 +38,7 @@ def plot_edge(p1, p2, color, text=""):
     plt.plot(p[0], p[1], linestyle="--", c=color)
 
     if text != "":
-        plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text)
+        plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text, clip_on=True)
 
 
 def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
@@ -47,8 +47,6 @@ def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axi
 
     plt.xlim([ORIGIN[0] - RADIUS*1.1, ORIGIN[0] + RADIUS*1.1])
     plt.ylim([ORIGIN[1] - RADIUS*1.1, ORIGIN[1] + RADIUS*1.1])
-
-    plt.rcParams["figure.autolayout"] = True
 
     # Plot the building edges
     for index, edge in edges.iterrows():
@@ -83,7 +81,7 @@ def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axi
     plt.plot(x, y, linestyle="--", c=AXIS_EDGE_COLOR)
 
     plt.grid(True)
-
+    plt.gca().set_aspect('equal', adjustable='box')
     fig = plt.gcf()
     fig.set_size_inches(7, 7)
     plt.show()

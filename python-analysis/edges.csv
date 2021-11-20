@@ -1,6 +1,14 @@
 tag,p1_tag,p2_tag,direction,virtual
 culc_main_entrance,culc0,culc1,N,0
 culc_back_1,culc1,culc2,E,0
-culc_connector,culc2,culc3,E,1
+culc_conn,culc2,culc3,E,1
 culc_back_entrance,culc3,culc4,S,0
 culc_tg,culc4,culc0,W,0
+lib_back,prglib0,prglib1,N,0
+lib_conn,prglib1,prglib2,E,0
+lib_front,prglib2,prglib3,S,0
+lib_vir,prglib3,prglib0,W,1
+crossland_vir,crossland0,crossland1,N,1
+crossland_side,crossland1,crossland2,E,0
+crossland_front,crossland2,crossland3,S,0
+crossland_conn,crossland3,crossland0,W,0
