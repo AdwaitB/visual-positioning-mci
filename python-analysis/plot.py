@@ -9,12 +9,13 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 
 from config import *
+from misc_utils import *
 
 
 def generate_edge_point(points, i, j):
     return [
-        [points['x'][i], points['x'][j]],
-        [points['y'][i], points['y'][j]]
+        [points['x'][i], points['y'][i]],
+        [points['x'][j], points['y'][j]]
     ]
 
 
@@ -29,7 +30,7 @@ def plot_point(point, color, text=""):
     plt.scatter(point[0], point[1], c=color)
 
     if text != "":
-        plt.text(point[0] + DIFF, point[1] + DIFF, text)
+        plt.text(point[0], point[1], text)
 
 
 def plot_edge(p1, p2, color, text=""):
@@ -37,22 +38,22 @@ def plot_edge(p1, p2, color, text=""):
     plt.plot(p[0], p[1], linestyle="--", c=color)
 
     if text != "":
-        plt.text((p1[0] + p2[0])/2 + DIFF, (p1[1] + p2[1])/2 + DIFF, text)
+        plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text)
 
 
-def plot_situation(points, edge_ids, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
-    plt.rcParams["figure.autolayout"] = True
+def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
+    print_util(points)
+    print_util(edges)
+    # plt.rcParams["figure.autolayout"] = True
 
     # Plot the building edges
-    for index, edge_id in edge_ids.iterrows():
-        plot_edge(points.iloc[edge_id['start']], points.iloc[edge_id['end']], edge_id['color'], index)
+    for index, edge in edges.iterrows():
+        [p1, p2] = generate_edge_point(points, edge['start'], edge['end'])
+        plot_edge(p1, p2, edge['color'], index)
 
     # Plot the points
     for index, row in points.iterrows():
-        plot_point([row['x'], row['y']], row['color'], "adwait")
-
-    plt.show()
-    return
+        plot_point([row['x'], row['y']], row['color'], index)
 
     # Plot the origin
     plt.scatter(ORIGIN[0], ORIGIN[1], c=ORIGIN_COLOR)
@@ -76,6 +77,9 @@ def plot_situation(points, edge_ids, viewpoint, viewpoint_begin, viewpoint_end, 
     y = RADIUS * np.sin(angle) + ORIGIN[1]
 
     plt.plot(x, y, linestyle="--", c=AXIS_EDGE_COLOR)
+
+    # plt.ylim([ORIGIN[1] - RADIUS*1.1, ORIGIN[1] + RADIUS*1.1])
+    # plt.xlim([ORIGIN[0] - RADIUS*1.1, ORIGIN[0] + RADIUS*1.1])
 
     plt.grid(True)
 
