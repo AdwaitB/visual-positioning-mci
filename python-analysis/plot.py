@@ -41,12 +41,13 @@ def plot_edge(p1, p2, color, text=""):
         plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text, clip_on=True)
 
 
-def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
-    print_util(points)
-    print_util(edges)
+def plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
+    if DEBUG_LEVEL >= 0:
+        print_util(points)
+        print_util(edges)
 
-    plt.xlim([ORIGIN[0] - RADIUS*1.1, ORIGIN[0] + RADIUS*1.1])
-    plt.ylim([ORIGIN[1] - RADIUS*1.1, ORIGIN[1] + RADIUS*1.1])
+    plt.xlim([origin[0] - radius * 1.1, origin[0] + radius * 1.1])
+    plt.ylim([origin[1] - radius * 1.1, origin[1] + radius * 1.1])
 
     # Plot the building edges
     for index, edge in edges.iterrows():
@@ -58,7 +59,7 @@ def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axi
         plot_point([row['x'], row['y']], row['color'], index)
 
     # Plot the origin
-    plt.scatter(ORIGIN[0], ORIGIN[1], c=ORIGIN_COLOR)
+    plt.scatter(origin[0], origin[1], c=ORIGIN_COLOR)
 
     # Plot the point of view
     plot_point(viewpoint, AXIS_POINT_COLOR)
@@ -67,16 +68,16 @@ def plot_situation(points, edges, viewpoint, viewpoint_begin, viewpoint_end, axi
     plot_point(axis_xp, AXIS_POINT_COLOR)
     plot_point(axis_xn, AXIS_POINT_COLOR)
 
-    plot_edge(ORIGIN, viewpoint, AXIS_EDGE_COLOR)
-    plot_edge(ORIGIN, viewpoint_begin, VIEWPOINT_EDGE_COLOR)
-    plot_edge(ORIGIN, viewpoint_end, VIEWPOINT_EDGE_COLOR)
-    plot_edge(ORIGIN, axis_xp, AXIS_EDGE_COLOR)
-    plot_edge(ORIGIN, axis_xn, AXIS_EDGE_COLOR)
+    plot_edge(origin, viewpoint, AXIS_EDGE_COLOR)
+    plot_edge(origin, viewpoint_begin, VIEWPOINT_EDGE_COLOR)
+    plot_edge(origin, viewpoint_end, VIEWPOINT_EDGE_COLOR)
+    plot_edge(origin, axis_xp, AXIS_EDGE_COLOR)
+    plot_edge(origin, axis_xn, AXIS_EDGE_COLOR)
 
     angle = np.linspace(0, 2 * math.pi, 150)
 
-    x = RADIUS * np.cos(angle) + ORIGIN[0]
-    y = RADIUS * np.sin(angle) + ORIGIN[1]
+    x = radius * np.cos(angle) + origin[0]
+    y = radius * np.sin(angle) + origin[1]
 
     plt.plot(x, y, linestyle="--", c=AXIS_EDGE_COLOR)
 

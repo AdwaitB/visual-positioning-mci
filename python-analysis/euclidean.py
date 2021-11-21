@@ -92,7 +92,7 @@ def get_perp_distance_points(p1, p2, point):
     return get_perp_distance(get_line(p1, p2), point)
 
 
-def check_edge_overlap(points, p11, p12, p21, p22):
+def check_edge_overlap(origin, points, p11, p12, p21, p22):
     if (p11 == p21) and (p12 == p22):
         return False
     elif (p11 == p22) and (p12 == p21):
@@ -119,12 +119,12 @@ def check_edge_overlap(points, p11, p12, p21, p22):
             [
                 points['x'][p11],
                 points['y'][p11]
-            ], ORIGIN),
+            ], origin),
         get_distance_points(
             [
                 points['x'][p12],
                 points['y'][p12]
-            ], ORIGIN)
+            ], origin)
     )
 
     min_2 = min(
@@ -132,12 +132,12 @@ def check_edge_overlap(points, p11, p12, p21, p22):
             [
                 points['x'][p21],
                 points['y'][p21]
-            ], ORIGIN),
+            ], origin),
         get_distance_points(
             [
                 points['x'][p22],
                 points['y'][p22]
-            ], ORIGIN)
+            ], origin)
     )
 
     distance_check = min_1 <= min_2

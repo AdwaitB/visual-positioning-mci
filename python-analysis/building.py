@@ -48,7 +48,7 @@ def get_building_set(points, edges_list):
     return id_to_build_map, buildings
 
 
-def split_edges_building(points, edges, edges_list, building):
+def split_edges_building(origin, points, edges, edges_list, building):
     colors = [x for x in edges['color']]
 
     invalid_edges = set()
@@ -61,7 +61,7 @@ def split_edges_building(points, edges, edges_list, building):
 
         if not np.isnan(point['normalized_angle']):
             points_sorted.append([
-                get_distance_points(ORIGIN, [point['x'], point['y']]),
+                get_distance_points(origin, [point['x'], point['y']]),
                 point['normalized_angle'], point_id, point['x'], point['y']
             ])
 
@@ -70,7 +70,8 @@ def split_edges_building(points, edges, edges_list, building):
     if len(points_sorted) == 0:
         return invalid_edges, valid_edges
 
-    print_util(points_sorted)
+    if DEBUG_LEVEL >= 0:
+        print_util(points_sorted)
 
     if len(points_sorted) == 0:
         return valid_edges, invalid_edges
@@ -150,11 +151,11 @@ def collect_span(span_edges, start_point, edges, points):
     return [span_start_pt, span_end_pt]
 
 
-def get_spans(points, edges, edges_list, buildings):
+def get_spans(origin, points, edges, edges_list, buildings):
     ret = {}
 
     for i in buildings.keys():
-        valid, invalid, start_point = split_edges_building(points, edges, edges_list, buildings[i])
+        valid, invalid, start_point = split_edges_building(origin, points, edges, edges_list, buildings[i])
 
         if DEBUG_LEVEL >= 1:
             print_util(i, "building ")

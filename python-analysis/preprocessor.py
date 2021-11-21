@@ -4,7 +4,7 @@ import pickle
 import cv2
 import numpy as np
 
-CSV_PATH = "python-analysis/edges.csv"
+from config import *
 
 
 def get_features_for_file(file_path):
@@ -48,7 +48,7 @@ def generate_features(folders):
 
 
 def process_csv():
-    with open(CSV_PATH, 'r') as csv_file:
+    with open(EDGES_PATH, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
         row_number = 0
         for row in csv_reader:
