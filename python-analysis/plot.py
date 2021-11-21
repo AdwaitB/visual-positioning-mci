@@ -41,7 +41,9 @@ def plot_edge(p1, p2, color, text=""):
         plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text, clip_on=True)
 
 
-def plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
+def plot_situation(origin, radius, points, edges, viewpoint,
+                   viewpoint_begin, viewpoint_end, viewpoint_reverse_end, viewpoint_reverse_begin,
+                   axis_xp, axis_xn):
     if DEBUG_LEVEL >= 1:
         print_util(points)
         print_util(edges)
@@ -66,12 +68,17 @@ def plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, vi
     plot_point(viewpoint, AXIS_POINT_COLOR)
     plot_point(viewpoint_begin, VIEWPOINT_COLOR)
     plot_point(viewpoint_end, VIEWPOINT_COLOR)
+    plot_point(viewpoint_reverse_begin, VIEWPOINT_COLOR_BACK)
+    plot_point(viewpoint_reverse_end, VIEWPOINT_COLOR_BACK)
+    plot_point(viewpoint_end, VIEWPOINT_COLOR)
     plot_point(axis_xp, AXIS_POINT_COLOR)
     plot_point(axis_xn, AXIS_POINT_COLOR)
 
     plot_edge(origin, viewpoint, AXIS_EDGE_COLOR)
     plot_edge(origin, viewpoint_begin, VIEWPOINT_EDGE_COLOR)
     plot_edge(origin, viewpoint_end, VIEWPOINT_EDGE_COLOR)
+    plot_edge(origin, viewpoint_reverse_begin, VIEWPOINT_EDGE_COLOR_BACK)
+    plot_edge(origin, viewpoint_reverse_end, VIEWPOINT_EDGE_COLOR_BACK)
     plot_edge(origin, axis_xp, AXIS_EDGE_COLOR)
     plot_edge(origin, axis_xn, AXIS_EDGE_COLOR)
 
@@ -85,5 +92,5 @@ def plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, vi
     plt.grid(True)
     plt.gca().set_aspect('equal', adjustable='box')
     fig = plt.gcf()
-    fig.set_size_inches(7, 7)
+    fig.set_size_inches(8, 8)
     plt.show()

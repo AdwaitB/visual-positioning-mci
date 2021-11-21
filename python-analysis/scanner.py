@@ -15,17 +15,21 @@ def tag_points_fov(origin, direction, radius, points):
     semicircle_angle_end = reference_angle + 90
     fov_angle_start = reference_angle - FOV / 2
     fov_angle_end = reference_angle + FOV / 2
+    reverse_fov_angle_start = reference_angle - (90 - FOV/2) - 90
+    reverse_fov_angle_end = reference_angle + (90 - FOV/2) + 90
 
-    if DEBUG_LEVEL >= 1:
+    if DEBUG_LEVEL >= 0:
         print("reference_angle : ", reference_angle)
         print("semicircle_angle_start : ", semicircle_angle_start)
         print("semicircle_angle_end: ", semicircle_angle_end)
         print("fov_angle_start: ", fov_angle_start)
         print("fov_angle_end: ", fov_angle_end)
+        print("reverse_fov_angle_start: ", reverse_fov_angle_start)
+        print("reverse_fov_angle_end: ", reverse_fov_angle_end)
 
     for index, row in points.iterrows():
         angle = get_angle([row['x'] - origin[0], row['y'] - origin[1]])
-        normalized_angles.append(normalize_angle(semicircle_angle_start-90, angle))
+        normalized_angles.append(normalize_angle(reference_angle, angle))
 
         dist = get_distance_points(origin, [row['x'], row['y']])
 
@@ -38,6 +42,10 @@ def tag_points_fov(origin, direction, radius, points):
             colors[index] = POINT_SEMI_1
         elif check_in_angle_range(fov_angle_end, semicircle_angle_end, angle):
             colors[index] = POINT_SEMI_2
+        elif check_in_angle_range(semicircle_angle_end, reverse_fov_angle_end, angle):
+            colors[index] = POINT_SEMI_3
+        elif check_in_angle_range(reverse_fov_angle_start, semicircle_angle_start, angle):
+            colors[index] = POINT_SEMI_4
 
     points['color'] = colors
     points['normalized_angle'] = normalized_angles
@@ -55,6 +63,18 @@ def tag_edges_fov(points, edges):
             colors[i] = EDGE_SPLIT
         elif (points['color'][edge['start']] == POINT_VIEW) or (
                 points['color'][edge['end']] == POINT_VIEW):
+            colors[i] = EDGE_VIEW
+        elif (points['color'][edge['start']] == POINT_SEMI_1) and (
+                points['color'][edge['end']] == POINT_SEMI_3):
+            colors[i] = EDGE_VIEW
+        elif (points['color'][edge['start']] == POINT_SEMI_3) and (
+                points['color'][edge['end']] == POINT_SEMI_1):
+            colors[i] = EDGE_VIEW
+        elif (points['color'][edge['start']] == POINT_SEMI_2) and (
+                points['color'][edge['end']] == POINT_SEMI_4):
+            colors[i] = EDGE_VIEW
+        elif (points['color'][edge['start']] == POINT_SEMI_2) and (
+                points['color'][edge['end']] == POINT_SEMI_4):
             colors[i] = EDGE_VIEW
 
     edges['color'] = colors
@@ -75,12 +95,12 @@ def remove_overshadowing_edges(origin, points, edges):
                 continue
 
             if check_edge_overlap(origin, points, edges['start'][i], edges['end'][i], edges['start'][j], edges['end'][j]):
-                colors[i] = EDGE_DEFAULT
+                colors[j] = EDGE_DEFAULT
 
                 if DEBUG_LEVEL >= 1:
                     print(j, " overlaps ", i)
 
-                break
+                continue
 
     edges['color'] = colors
 
@@ -137,10 +157,13 @@ def tag_edges_by_view(origin, direction, radius):
     viewpoint_begin = rotate_point(viewpoint, origin, FOV / 2)
     viewpoint_end = rotate_point(viewpoint, origin, -FOV / 2)
 
+    viewpoint_reverse_end = rotate_point(viewpoint, origin, -90 - (90 - FOV/2))
+    viewpoint_reverse_begin = rotate_point(viewpoint, origin, 90 + (90 - FOV/2))
+
     axis_xp = rotate_point(viewpoint, origin, -90)
     axis_xn = rotate_point(viewpoint, origin, 90)
 
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print("base_angle ", base_angle)
         print("viewpoint ", viewpoint)
         print("viewpoint_begin ", viewpoint_begin)
@@ -187,7 +210,9 @@ def tag_edges_by_view(origin, direction, radius):
 
     ###################
 
-    plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn)
+    plot_situation(origin, radius, points, edges, viewpoint,
+                   viewpoint_begin, viewpoint_end, viewpoint_reverse_begin, viewpoint_reverse_end,
+                   axis_xp, axis_xn)
 
     return edges
 

@@ -42,9 +42,9 @@ def add_vector_to_point(point, vector, size):
 
 def normalize_angle(reference, angle):
     ret = angle - reference
-    if ret < 0:
+    if ret < -180:
         ret += 360
-    if ret > 360:
+    if ret > 180:
         ret -= 360
     return ret
 

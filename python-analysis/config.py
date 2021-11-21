@@ -9,7 +9,9 @@ ORIGINAL_DATA = True
 # Used mainly as tags, repurposed as colors to plot
 POINT_DEFAULT = 'lightblue'
 POINT_SEMI_1 = 'crimson'
-POINT_SEMI_2 = 'fuchsia'
+POINT_SEMI_2 = 'brown'
+POINT_SEMI_3 = 'coral'
+POINT_SEMI_4 = 'gold'
 POINT_VIEW = 'black'
 
 EDGE_DEFAULT = 'lightblue'
@@ -18,15 +20,17 @@ EDGE_VIEW = 'black'
 
 ORIGIN_COLOR = 'lime'
 VIEWPOINT_COLOR = 'orange'
+VIEWPOINT_COLOR_BACK = 'moccasin'
 VIEWPOINT_EDGE_COLOR = 'orange'
+VIEWPOINT_EDGE_COLOR_BACK = 'moccasin'
 
 AXIS_POINT_COLOR = 'lightgreen'
 AXIS_EDGE_COLOR = 'lightgreen'
 
-SHOW_TEXT = False
+SHOW_TEXT = True
 FIX_RAD_LIMIT = True
 
-FOV = 70
+FOV = 90
 
 POINTS_PATH = "points.csv"
 EDGES_PATH = "edges.csv"

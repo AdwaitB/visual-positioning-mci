@@ -155,10 +155,19 @@ def get_spans(origin, points, edges, edges_list, buildings):
     ret = {}
 
     for i in buildings.keys():
+        is_in_view = False
+        for building in buildings[i]:
+            if points['color'][building] == POINT_VIEW:
+                is_in_view = True
+                break
+
+        if not is_in_view:
+            continue
+
         valid, invalid, start_point = split_edges_building(origin, points, edges, edges_list, buildings[i])
 
         if DEBUG_LEVEL >= 1:
-            print_util(i, "building ")
+            print_util(i, "building")
             print_util(valid, "valid")
             print_util(invalid, "invalid")
 
