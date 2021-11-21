@@ -2,7 +2,7 @@ NPOINTS = 10
 
 SEED = 1
 
-DEBUG_LEVEL = -1
+DEBUG_LEVEL = 0
 
 ORIGINAL_DATA = True
 
@@ -22,6 +22,9 @@ VIEWPOINT_EDGE_COLOR = 'orange'
 
 AXIS_POINT_COLOR = 'lightgreen'
 AXIS_EDGE_COLOR = 'lightgreen'
+
+SHOW_TEXT = False
+FIX_RAD_LIMIT = True
 
 FOV = 70
 

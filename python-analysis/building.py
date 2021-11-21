@@ -70,7 +70,7 @@ def split_edges_building(origin, points, edges, edges_list, building):
     if len(points_sorted) == 0:
         return invalid_edges, valid_edges
 
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(points_sorted)
 
     if len(points_sorted) == 0:

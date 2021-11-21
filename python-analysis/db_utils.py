@@ -13,7 +13,7 @@ def read_edges(points, filename="edges.csv"):
     data = pd.read_csv(filename)
     data['color'] = [EDGE_DEFAULT]*len(data)
 
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print(data['p1_tag'])
 
     point_tag_to_id = {}

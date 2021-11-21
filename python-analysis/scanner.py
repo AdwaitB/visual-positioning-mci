@@ -25,7 +25,7 @@ def tag_points_fov(origin, direction, radius, points):
 
     for index, row in points.iterrows():
         angle = get_angle([row['x'] - origin[0], row['y'] - origin[1]])
-        normalized_angles.append(normalize_angle(semicircle_angle_start, angle))
+        normalized_angles.append(normalize_angle(semicircle_angle_start-90, angle))
 
         dist = get_distance_points(origin, [row['x'], row['y']])
 
@@ -116,16 +116,16 @@ def tag_edges_by_view(origin, direction, radius):
         points = generate_data(NPOINTS)
         edges = get_edges()
 
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(points, "points")
         print_util(edges, "edges")
 
     edges_mat = get_adj_mat(points, edges)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(edges_mat, "edges_mat")
 
     edges_list = get_adj_list(points, edges)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(edges_list, "edges_list")
 
     ###################
@@ -151,19 +151,19 @@ def tag_edges_by_view(origin, direction, radius):
     ###################
 
     tag_points_fov(origin, direction, radius, points)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(points, "points")
 
     ###################
 
     tag_edges_fov(points, edges)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(edges)
 
     ###################
 
     id_to_build_map, buildings = get_building_set(points, edges_list)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(id_to_build_map, "id_to_build_map")
         print_util(buildings, "buildings")
 
@@ -176,13 +176,13 @@ def tag_edges_by_view(origin, direction, radius):
     ###################
 
     remove_overshadowing_edges(origin, points, edges)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(edges, "edges after overshadow filter")
 
     ###################
 
     remove_overshadowing_edges_spans(origin, points, edges, spans)
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(edges, "edges after spanned overshadow filter")
 
     ###################

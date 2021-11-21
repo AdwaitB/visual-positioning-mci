@@ -29,7 +29,7 @@ def generate_edge_point_raw(p1, p2):
 def plot_point(point, color, text=""):
     plt.scatter(point[0], point[1], c=color)
 
-    if text != "":
+    if (text != "") and SHOW_TEXT:
         plt.text(point[0], point[1], text, clip_on=True)
 
 
@@ -37,17 +37,18 @@ def plot_edge(p1, p2, color, text=""):
     p = generate_edge_point_raw(p1, p2)
     plt.plot(p[0], p[1], linestyle="--", c=color)
 
-    if text != "":
+    if (text != "") and SHOW_TEXT:
         plt.text((p1[0] + p2[0])/2, (p1[1] + p2[1])/2, text, clip_on=True)
 
 
 def plot_situation(origin, radius, points, edges, viewpoint, viewpoint_begin, viewpoint_end, axis_xp, axis_xn):
-    if DEBUG_LEVEL >= 0:
+    if DEBUG_LEVEL >= 1:
         print_util(points)
         print_util(edges)
 
-    plt.xlim([origin[0] - radius * 1.1, origin[0] + radius * 1.1])
-    plt.ylim([origin[1] - radius * 1.1, origin[1] + radius * 1.1])
+    if FIX_RAD_LIMIT:
+        plt.xlim([origin[0] - radius * 1.1, origin[0] + radius * 1.1])
+        plt.ylim([origin[1] - radius * 1.1, origin[1] + radius * 1.1])
 
     # Plot the building edges
     for index, edge in edges.iterrows():

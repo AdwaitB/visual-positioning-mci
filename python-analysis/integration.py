@@ -1,9 +1,13 @@
 from scanner import *
 
 if ORIGINAL_DATA:
-    radius = 0.0015
-    # ORIGIN = [33.77435829374495, -84.397344643052] # Tech green
-    origin = [33.7754096889298, -84.39580062968061] # Bus Stop
+    radius = 0.001
+    # origin = [33.77435829374495, -84.397344643052] # Tech green
+    # origin = [33.7754096889298, -84.39580062968061] # Bus Stop
+    # origin = [33.77567129853454, -84.39715893627394] # Hive
+    # origin = [33.77637681793485, -84.39690871277799] # Pettit
+    # origin = [33.77692237952651, -84.39637874707857] # Klaus
+    origin = [33.77570781753953, -84.39607218474292] # Industrial Design
     origin.reverse()
 
     DIFF = 0.001
@@ -13,8 +17,7 @@ else:
 
     DIFF = 0.1
 
-
-direction = [0, -1]
+direction = [-1, 1]
 
 
 def main():
