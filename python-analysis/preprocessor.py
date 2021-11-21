@@ -46,6 +46,13 @@ def generate_features(folders):
             # Save the descriptor using numpy.save
             np.save("./db/" + folder + "/" + file + ".npy", descriptor)
 
+            deserialized_keypoints = []
+            for point in keypoint:
+                temp = (point.pt, point.size, point.angle, point.response, point.octave, point.class_id)
+                deserialized_keypoints.append(temp)
+            with open("./db/" + folder + "/" + file + ".pkl", 'wb') as f:
+                pickle.dump(deserialized_keypoints, f)
+
 
 def process_csv():
     with open(EDGES_PATH, 'r') as csv_file:
