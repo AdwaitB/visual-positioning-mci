@@ -34,33 +34,6 @@ else:
 
 direction = [-1, 1]
 
-def calculateMatches(des1,des2):
-    bf = cv2.BFMatcher()
-    matches = bf.knnMatch(des1,des2,k=2)
-    topResults1 = []
-    for m,n in matches:
-        if m.distance < 0.7*n.distance:
-            topResults1.append([m])
-            
-    matches = bf.knnMatch(des2,des1,k=2)
-    topResults2 = []
-    for m,n in matches:
-        if m.distance < 0.7*n.distance:
-            topResults2.append([m])
-    
-    topResults = []
-    for match1 in topResults1:
-        match1QueryIndex = match1[0].queryIdx
-        match1TrainIndex = match1[0].trainIdx
-
-        for match2 in topResults2:
-            match2QueryIndex = match2[0].queryIdx
-            match2TrainIndex = match2[0].trainIdx
-
-            if (match1QueryIndex == match2TrainIndex) and (match1TrainIndex == match2QueryIndex):
-                topResults.append(match1)
-    return topResults
-
 def fetchKeypointFromFile(filepath):
     keypoint = []
     file = open(filepath,'rb')
@@ -128,8 +101,6 @@ def main():
         degree = hex_to_int(degree)
         print(degree)
 
-        degree = 255
-
         conn.close()
         gpsInfo = exif['GPSInfo']
 
@@ -172,8 +143,7 @@ def main():
             files = [f for f in os.listdir(path) if f.endswith('.jpeg') or f.endswith('.jpg')]
             print(files)
             for file in files:
-                # bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
-                bf = cv2.BFMatcher()
+                bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
 
                 keypoint_file_path = path + file + ".pkl"
                 descriptor_file_path = path + file + ".npy"
@@ -181,18 +151,19 @@ def main():
                 comparekeypoint = fetchKeypointFromFile(keypoint_file_path)
                 comparedescriptor = np.load(descriptor_file_path)
 
-                # matches = bf.match(querydescriptor, comparedescriptor)
-                # matches = sorted(matches, key = lambda x:x.distance)
-                # score = calculateScore(len(matches), len(querykeypoint), len(comparekeypoint))
-
-                matches = calculateMatches(querydescriptor, comparedescriptor)
+                matches = bf.match(querydescriptor, comparedescriptor)
+                matches = sorted(matches, key = lambda x:x.distance)
                 score = calculateScore(len(matches), len(querykeypoint), len(comparekeypoint))
 
+                print(file)
                 print(score)
                 if score > max_match:
                     max_match = score
                     max_match_tag = folder
-                print(max_match_tag)
+
+        print(max_match)
+        print("Probable location is :")
+        print(max_match_tag)
 
 
 
