@@ -2,24 +2,42 @@ import csv
 import os
 import pickle
 import cv2
+import time
+
 import numpy as np
 
 from config import *
 
 
-def get_features_for_file(file_path):
-    # Read the image
-    img = cv2.imread(file_path)
-    # Convert to grayscale
-    print(file_path)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #sift
-    sift = cv2.xfeatures2d.SIFT_create()
-    # Detect the keypoints and descriptors
-    keypoint, descriptor = sift.detectAndCompute(gray, None)
-    print(descriptor.ndim)
-    print(descriptor.shape)
-    return keypoint, descriptor
+def resize(img, scale=30):
+    w = int(img.shape[1]*scale/100)
+    h = int(img.shape[0]*scale/100)
+    resized = cv2.resize(img, (w, h), interpolation=cv2.INTER_AREA)
+    return resized
+
+
+def get_features(img):
+    start = time.time()
+    temp = resize(img, 40)
+
+    temp = cv2.fastNlMeansDenoisingColored(temp, None, 10, 10, 7, 21)
+    temp = cv2.cvtColor(temp, cv2.COLOR_BGR2GRAY)
+    temp = cv2.GaussianBlur(temp, (3, 3), 0)
+    temp = cv2.Canny(image=temp, threshold1=100, threshold2=200)
+    thresh, temp = cv2.threshold(temp, 127, 255, cv2.THRESH_BINARY)
+
+    if FEATURE == "SIFT":
+        sift = cv2.SIFT_create()
+        keypoints, descriptor = sift.detectAndCompute(temp, None)
+    elif FEATURE == "ORB":
+        orb = cv2.ORB_create(nfeatures=2000)
+        keypoints, descriptor = orb.detectAndCompute(temp, None)
+
+    temp = cv2.drawKeypoints(temp, keypoints, img, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    end = time.time()
+    print("Features took ", end - start, " seconds.")
+    return keypoints, descriptor, temp
 
 
 # Function to get list of all folders inside a folder
@@ -34,6 +52,8 @@ def get_folders(folder):
 # Function that takes a list of folders and reads the files inside them
 def generate_features(folders):
     for folder in folders:
+        print()
+        print(folder)
         # Get all the files in the folder
         files = os.listdir("./db/" + folder)
         # For each file, generate a feature vector
@@ -42,7 +62,9 @@ def generate_features(folders):
                 continue
             # Get the file path
             file_path = "./db/" + folder + "/" + file
-            keypoint, descriptor = get_features_for_file(file_path)
+            print(file_path)
+            img = cv2.imread(file_path)
+            keypoint, descriptor, processed_img = get_features(img)
             # Save the descriptor using numpy.save
             np.save("./db/" + folder + "/" + file + ".npy", descriptor)
 

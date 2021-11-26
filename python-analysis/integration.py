@@ -9,6 +9,8 @@ import numpy as np
 
 from PIL import Image, ExifTags
 
+from preprocessor import get_features
+
 IP_MOBILE = "0.0.0.0"
 PORT = 8500
 
@@ -17,12 +19,19 @@ img_no = 0
 
 if ORIGINAL_DATA:
     radius = 0.001
-    # origin = [33.77435829374495, -84.397344643052] # Tech green
-    # origin = [33.7754096889298, -84.39580062968061] # Bus Stop
-    # origin = [33.77567129853454, -84.39715893627394] # Hive
-    # origin = [33.77637681793485, -84.39690871277799] # Pettit
-    # origin = [33.77692237952651, -84.39637874707857] # Klaus
-    origin = [33.77570781753953, -84.39607218474292] # Industrial Design
+
+    data = {
+        "TG": [[33.77435829374495, -84.397344643052], [1, 0]],
+        "BusStop": [[33.7754096889298, -84.39580062968061], [0, -1]],
+        "Hive1": [[33.77567129853454, -84.39715893627394], [1, 1]],
+        "Hive2": [[33.77567129853454, -84.39715893627394], [-1, -1]],
+        "Pettit": [[33.77637681793485, -84.39690871277799], [1, 1]],
+        "Klaus1": [[33.77692237952651, -84.39637874707857], [1, 1]],
+        "Klaus2": [[33.77692237952651, -84.39637874707857], [-1, 1]],
+        "IndustrialDesign": [[33.77570781753953, -84.39607218474292], [1, 1]],
+        "CULC": [[33.773985, -84.396579], [0, 1]]
+    }
+    origin, direction = data["CULC"]
     origin.reverse()
 
     DIFF = 0.001
@@ -34,22 +43,27 @@ else:
 
 direction = [-1, 1]
 
+
 def fetchKeypointFromFile(filepath):
     keypoint = []
     file = open(filepath,'rb')
     deserializedKeypoints = pickle.load(file)
     file.close()
     for point in deserializedKeypoints:
-        temp = cv2.KeyPoint(x=point[0][0],y=point[0][1],size=point[1], angle=point[2], response=point[3], octave=point[4], class_id=point[5])
+        temp = cv2.KeyPoint(x=point[0][0], y=point[0][1], size=point[1], angle=point[2],
+                            response=point[3], octave=point[4], class_id=point[5])
         keypoint.append(temp)
     return keypoint
 
-def calculateScore(matches,keypoint1,keypoint2):
-    return 100 * (matches/min(keypoint1,keypoint2))
+
+def calculate_score(matches, keypoint1, keypoint2):
+    return 100 * (len(matches)/min(len(keypoint1), len(keypoint2)))
+
 
 # Function to convert hex byte array to int
 def hex_to_int(hex_array):
     return int(hex_array.hex(), 16)
+
 
 def receive_file(conn, file_name):
     buf = bytes()
@@ -67,6 +81,7 @@ def receive_file(conn, file_name):
 
     print('File received successfully')
 
+
 # Convert degrees minutes second to decimal degrees
 def dms_to_dd(dms):
     degrees = dms[0]
@@ -76,69 +91,62 @@ def dms_to_dd(dms):
     dd = degrees + (minutes/60) + (seconds/3600)
     return dd
 
+
 def main():
-    global img_no
-    address = (IP_MOBILE, PORT)
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(address)
-    s.listen(1000)
+    if not INTEGRATION_LOCAL:
+        global img_no
+        address = (IP_MOBILE, PORT)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(address)
+        s.listen(1000)
 
     while True:
-        conn, addr = s.accept()
-        print('Connected by', addr)
-        print('Receiving file')
-        receive_file(conn, 'tst.jpg')
-        img_no += 1
-        img = Image.open("tst.jpg")
-        exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
-        conn.close()
+        if not INTEGRATION_LOCAL:
+            conn, addr = s.accept()
+            print('Connected by', addr)
+            print('Receiving file')
+            receive_file(conn, INTEGRATION_COMM_FILE)
+            img_no += 1
+            img = Image.open(INTEGRATION_COMM_FILE)
+            exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
+            conn.close()
 
-        conn, addr = s.accept()
-        print('Connected by', addr)
-        print('Receiving degree')
-        # Receive a float variable over the connection
-        degree = conn.recv(1024)
-        degree = hex_to_int(degree)
-        print(degree)
+            conn, addr = s.accept()
+            print('Connected by', addr)
+            print('Receiving degree')
+            # Receive a float variable over the connection
+            degree = conn.recv(1024)
+            degree = hex_to_int(degree)
+            print(degree)
 
-        conn.close()
-        gpsInfo = exif['GPSInfo']
+            conn.close()
+            gpsInfo = exif['GPSInfo']
 
-        origin = [-1 * dms_to_dd(gpsInfo[4]), dms_to_dd(gpsInfo[2])]
-        direction = []
+            origin = [-1 * dms_to_dd(gpsInfo[4]), dms_to_dd(gpsInfo[2])]
+            direction = []
 
-        # get cos and sin of the degree
-        cos_d = math.cos(math.radians(degree))
-        sin_d = math.sin(math.radians(degree))
+            # get cos and sin of the degree
+            cos_d = math.cos(math.radians(degree))
+            sin_d = math.sin(math.radians(degree))
 
-        direction = [sin_d, cos_d]
-
-        print(direction)
+            direction = [sin_d, cos_d]
+            print(direction)
+        else:
+            img = cv2.imread(INTEGRATION_LOCAL_FILE)
+            origin, direction = data["CULC"]
 
         edges = tag_edges_by_view(origin, direction, radius)
-
-        print_util(edges, "edges final")
 
         black_edges = edges[(edges['color'] == 'black')]['tag'].tolist()
         print(black_edges)
 
-        BASE_PATH = './db/'
-
         max_match = 0
         max_match_tag = None
 
-        img = cv2.imread('./tst.jpg')
-
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        sift = cv2.xfeatures2d.SIFT_create()
-
-        querykeypoint, querydescriptor = sift.detectAndCompute(gray, None)
-
-        
+        querykeypoint, querydescriptor, processed_img = get_features(img)
 
         for folder in black_edges:
-            path = BASE_PATH + folder + '/'
+            path = DB_PATH + folder + '/'
             # get a list of all jpg files in path folder
             files = [f for f in os.listdir(path) if f.endswith('.jpeg') or f.endswith('.jpg')]
             print(files)
@@ -152,11 +160,14 @@ def main():
                 comparedescriptor = np.load(descriptor_file_path)
 
                 matches = bf.match(querydescriptor, comparedescriptor)
-                matches = sorted(matches, key = lambda x:x.distance)
-                score = calculateScore(len(matches), len(querykeypoint), len(comparekeypoint))
+                matches = sorted(matches, key=lambda x: x.distance)
+                score = calculate_score(matches, querykeypoint, comparekeypoint)
+
+                print(matches[0])
 
                 print(file)
                 print(score)
+
                 if score > max_match:
                     max_match = score
                     max_match_tag = folder
@@ -164,15 +175,10 @@ def main():
         print(max_match)
         print("Probable location is :")
         print(max_match_tag)
-
-
-
-
-                
-
-
-
         print('Reached end of loop')
+
+        if INTEGRATION_LOCAL:
+            break
 
 
 if __name__ == '__main__':

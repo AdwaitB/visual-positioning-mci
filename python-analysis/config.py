@@ -30,7 +30,14 @@ AXIS_EDGE_COLOR = 'lightgreen'
 SHOW_TEXT = True
 FIX_RAD_LIMIT = True
 
-FOV = 90
+FOV = 20
 
 POINTS_PATH = "points.csv"
 EDGES_PATH = "edges.csv"
+DB_PATH = './db/'
+
+INTEGRATION_LOCAL = True
+INTEGRATION_COMM_FILE = "./images/test.jpeg"
+INTEGRATION_LOCAL_FILE = "./images/example.jpeg"
+
+FEATURE = "SIFT" # ORB, SIFT
