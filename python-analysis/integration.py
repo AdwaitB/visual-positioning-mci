@@ -1,4 +1,5 @@
 from scanner import *
+from matcher import *
 import socket
 import struct
 import os
@@ -132,13 +133,15 @@ def main():
             direction = [sin_d, cos_d]
             print(direction)
         else:
-            img = cv2.imread(INTEGRATION_LOCAL_FILE)
             origin, direction = data["CULC"]
 
+        img = cv2.imread(INTEGRATION_LOCAL_FILE)
         edges = tag_edges_by_view(origin, direction, radius)
 
+        print("Edges are:" + str(edges))
+
         black_edges = edges[(edges['color'] == 'black')]['tag'].tolist()
-        print(black_edges)
+        print("Black edges are:" + str(black_edges))
 
         max_match = 0
         max_match_tag = None
@@ -151,19 +154,14 @@ def main():
             files = [f for f in os.listdir(path) if f.endswith('.jpeg') or f.endswith('.jpg')]
             print(files)
             for file in files:
-                bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
-
                 keypoint_file_path = path + file + ".pkl"
                 descriptor_file_path = path + file + ".npy"
 
                 comparekeypoint = fetchKeypointFromFile(keypoint_file_path)
                 comparedescriptor = np.load(descriptor_file_path)
 
-                matches = bf.match(querydescriptor, comparedescriptor)
-                matches = sorted(matches, key=lambda x: x.distance)
-                score = calculate_score(matches, querykeypoint, comparekeypoint)
-
-                print(matches[0])
+                matches = match_feature_points(querydescriptor, comparedescriptor)
+                score = len(lowes_ratio_test(matches))
 
                 print(file)
                 print(score)

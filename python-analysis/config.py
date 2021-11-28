@@ -30,7 +30,7 @@ AXIS_EDGE_COLOR = 'lightgreen'
 SHOW_TEXT = True
 FIX_RAD_LIMIT = True
 
-FOV = 20
+FOV = 90
 
 POINTS_PATH = "points.csv"
 EDGES_PATH = "edges.csv"
