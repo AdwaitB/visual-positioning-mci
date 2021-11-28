@@ -145,6 +145,7 @@ def main():
 
         max_match = 0
         max_match_tag = None
+        max_file = None
 
         querykeypoint, querydescriptor, processed_img = get_features(img)
 
@@ -169,11 +170,20 @@ def main():
                 if score > max_match:
                     max_match = score
                     max_match_tag = folder
+                    max_file = file
 
         print(max_match)
         print("Probable location is :")
         print(max_match_tag)
         print('Reached end of loop')
+
+        # Use cv2 to read an image and display it
+        max_match_file = DB_PATH + max_match_tag + '/' + max_file
+        print(max_match_file)
+
+        im = Image.open(max_match_file)
+        im.show()
+
 
         if INTEGRATION_LOCAL:
             break
