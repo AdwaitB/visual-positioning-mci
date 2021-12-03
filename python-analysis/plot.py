@@ -92,5 +92,5 @@ def plot_situation(origin, radius, points, edges, viewpoint,
     plt.grid(True)
     plt.gca().set_aspect('equal', adjustable='box')
     fig = plt.gcf()
-    fig.set_size_inches(8, 8)
+    fig.set_size_inches(11, 11)
     plt.show()

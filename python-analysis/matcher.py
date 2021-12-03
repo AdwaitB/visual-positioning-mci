@@ -31,3 +31,13 @@ def lowes_ratio_test(matches):
             ret.append(m)
 
     return ret
+
+
+def lowes_ratio_test_filter(matches):
+    ret = []
+
+    for m, n in matches:
+        if m.distance < 0.7 * n.distance:
+            ret.append((m, n))
+
+    return ret

@@ -27,8 +27,8 @@ VIEWPOINT_EDGE_COLOR_BACK = 'moccasin'
 AXIS_POINT_COLOR = 'lightgreen'
 AXIS_EDGE_COLOR = 'lightgreen'
 
-SHOW_TEXT = True
-FIX_RAD_LIMIT = True
+SHOW_TEXT = False
+FIX_RAD_LIMIT = False
 
 FOV = 90
 
