@@ -31,6 +31,7 @@ SHOW_TEXT = False
 FIX_RAD_LIMIT = False
 
 FOV = 90
+MATCHING_THRESHOLD = 20
 
 POINTS_PATH = "points.csv"
 EDGES_PATH = "edges.csv"
@@ -39,5 +40,6 @@ DB_PATH = './db/'
 INTEGRATION_LOCAL = True
 INTEGRATION_COMM_FILE = "./images/test.jpeg"
 INTEGRATION_LOCAL_FILE = "./images/example.jpeg"
+INTEGRATION_LOCAL_DIRECTORY = "./images/testing_images"
 
 FEATURE = "SIFT" # ORB, SIFT
